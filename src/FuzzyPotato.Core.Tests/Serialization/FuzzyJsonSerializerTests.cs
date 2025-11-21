@@ -15,6 +15,15 @@ namespace FuzzyPotato.Core.Tests.Serialization
     {
         private FuzzyJsonSerializer _serializer = null!;
 
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext context)
+        {
+            // Register types for polymorphic serialization
+            TypeRegistry.Register<TextDocument>("text-document");
+            TypeRegistry.Register<ImageDocument>("image-document");
+            TypeRegistry.Register<VideoDocument>("video-document");
+        }
+
         [TestInitialize]
         public void Setup()
         {
@@ -82,7 +91,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var json = this._serializer.Serialize(original);
 
             // Act
-            var deserialized = this._serializer.DeserializePolymorphic(json);
+            var deserialized = this._serializer.Deserialize<DocumentBase>(json);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -124,7 +133,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var json = this._serializer.SerializeCollection(documents);
 
             // Act
-            var deserialized = this._serializer.DeserializeCollection(json)?.ToList();
+            var deserialized = this._serializer.DeserializeCollection<DocumentBase>(json)?.ToList();
 
             // Assert
             deserialized.Should().NotBeNull();

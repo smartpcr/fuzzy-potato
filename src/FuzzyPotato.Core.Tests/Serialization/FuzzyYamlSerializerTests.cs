@@ -85,7 +85,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var yaml = this._serializer.Serialize(original);
 
             // Act
-            var deserialized = this._serializer.DeserializePolymorphic(yaml);
+            var deserialized = this._serializer.Deserialize<DocumentBase>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -127,7 +127,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var yaml = this._serializer.SerializeCollection(documents);
 
             // Act
-            var deserialized = this._serializer.DeserializeCollection(yaml)?.ToList();
+            var deserialized = this._serializer.DeserializeCollection<DocumentBase>(yaml)?.ToList();
 
             // Assert
             deserialized.Should().NotBeNull();

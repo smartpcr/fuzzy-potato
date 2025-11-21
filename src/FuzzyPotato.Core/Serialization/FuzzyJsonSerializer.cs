@@ -11,7 +11,7 @@ namespace FuzzyPotato.Core.Serialization
     using FuzzyPotato.Core.Models;
 
     /// <summary>
-    /// JSON serializer with polymorphic support.
+    /// JSON serializer with TypeRegistry-based polymorphic support.
     /// </summary>
     public class FuzzyJsonSerializer
     {
@@ -31,6 +31,7 @@ namespace FuzzyPotato.Core.Serialization
                 Converters =
                 {
                     new JsonStringEnumConverter(JsonNamingPolicy.CamelCase),
+                    new PolymorphicJsonConverterFactory(), // Handle TypeRegistry-registered types automatically
                 },
             };
 
@@ -39,54 +40,50 @@ namespace FuzzyPotato.Core.Serialization
 
         /// <summary>
         /// Serializes an object to JSON string.
+        /// Polymorphic types registered with TypeRegistry are automatically handled.
         /// </summary>
         /// <typeparam name="T">The type of object to serialize.</typeparam>
         /// <param name="value">The object to serialize.</param>
         /// <returns>JSON string representation.</returns>
-        public string Serialize<T>(T value) where T : PolymorphicBase
+        public string Serialize<T>(T value)
         {
-            return JsonSerializer.Serialize<PolymorphicBase>(value, this._options);
+            return JsonSerializer.Serialize(value, this._options);
         }
 
         /// <summary>
-        /// Serializes a collection of polymorphic objects to JSON string.
+        /// Serializes a collection of objects to JSON string.
+        /// Polymorphic types registered with TypeRegistry are automatically handled.
         /// </summary>
+        /// <typeparam name="T">The base type of collection items.</typeparam>
         /// <param name="values">The collection to serialize.</param>
         /// <returns>JSON string representation.</returns>
-        public string SerializeCollection(IEnumerable<PolymorphicBase> values)
+        public string SerializeCollection<T>(IEnumerable<T> values)
         {
             return JsonSerializer.Serialize(values, this._options);
         }
 
         /// <summary>
         /// Deserializes JSON string to an object.
+        /// Polymorphic types registered with TypeRegistry are automatically handled.
         /// </summary>
         /// <typeparam name="T">The expected type.</typeparam>
         /// <param name="json">The JSON string.</param>
         /// <returns>Deserialized object.</returns>
-        public T? Deserialize<T>(string json) where T : PolymorphicBase
+        public T? Deserialize<T>(string json)
         {
             return JsonSerializer.Deserialize<T>(json, this._options);
         }
 
         /// <summary>
-        /// Deserializes JSON string to a polymorphic base object.
+        /// Deserializes JSON string to a collection of objects.
+        /// Polymorphic types registered with TypeRegistry are automatically handled.
         /// </summary>
-        /// <param name="json">The JSON string.</param>
-        /// <returns>Deserialized object.</returns>
-        public PolymorphicBase? DeserializePolymorphic(string json)
-        {
-            return JsonSerializer.Deserialize<PolymorphicBase>(json, this._options);
-        }
-
-        /// <summary>
-        /// Deserializes JSON string to a collection of polymorphic objects.
-        /// </summary>
+        /// <typeparam name="T">The base type of collection items.</typeparam>
         /// <param name="json">The JSON string.</param>
         /// <returns>Collection of deserialized objects.</returns>
-        public IEnumerable<PolymorphicBase>? DeserializeCollection(string json)
+        public IEnumerable<T>? DeserializeCollection<T>(string json)
         {
-            return JsonSerializer.Deserialize<IEnumerable<PolymorphicBase>>(json, this._options);
+            return JsonSerializer.Deserialize<IEnumerable<T>>(json, this._options);
         }
 
         /// <summary>
@@ -101,10 +98,9 @@ namespace FuzzyPotato.Core.Serialization
             string filePath,
             T value,
             CancellationToken cancellationToken = default)
-            where T : PolymorphicBase
         {
-            await using var stream = File.Create(filePath);
-            await JsonSerializer.SerializeAsync<PolymorphicBase>(stream, value, this._options, cancellationToken);
+            var json = this.Serialize(value);
+            await File.WriteAllTextAsync(filePath, json, cancellationToken);
         }
 
         /// <summary>
@@ -117,66 +113,9 @@ namespace FuzzyPotato.Core.Serialization
         public async Task<T?> DeserializeFromFileAsync<T>(
             string filePath,
             CancellationToken cancellationToken = default)
-            where T : PolymorphicBase
         {
-            await using var stream = File.OpenRead(filePath);
-            return await JsonSerializer.DeserializeAsync<T>(stream, this._options, cancellationToken);
-        }
-
-        // General object serialization methods (without PolymorphicBase constraint)
-
-        /// <summary>
-        /// Serializes any object to JSON string.
-        /// </summary>
-        /// <typeparam name="T">The type of object to serialize.</typeparam>
-        /// <param name="value">The object to serialize.</param>
-        /// <returns>JSON string representation.</returns>
-        public string SerializeObject<T>(T value)
-        {
-            return JsonSerializer.Serialize(value, this._options);
-        }
-
-        /// <summary>
-        /// Deserializes JSON string to any object type.
-        /// </summary>
-        /// <typeparam name="T">The expected type.</typeparam>
-        /// <param name="json">The JSON string.</param>
-        /// <returns>Deserialized object.</returns>
-        public T? DeserializeObject<T>(string json)
-        {
-            return JsonSerializer.Deserialize<T>(json, this._options);
-        }
-
-        /// <summary>
-        /// Serializes any object to a JSON file.
-        /// </summary>
-        /// <typeparam name="T">The type of object to serialize.</typeparam>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="value">The object to serialize.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SerializeObjectToFileAsync<T>(
-            string filePath,
-            T value,
-            CancellationToken cancellationToken = default)
-        {
-            await using var stream = File.Create(filePath);
-            await JsonSerializer.SerializeAsync(stream, value, this._options, cancellationToken);
-        }
-
-        /// <summary>
-        /// Deserializes a JSON file to any object type.
-        /// </summary>
-        /// <typeparam name="T">The expected type.</typeparam>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Deserialized object.</returns>
-        public async Task<T?> DeserializeObjectFromFileAsync<T>(
-            string filePath,
-            CancellationToken cancellationToken = default)
-        {
-            await using var stream = File.OpenRead(filePath);
-            return await JsonSerializer.DeserializeAsync<T>(stream, this._options, cancellationToken);
+            var json = await File.ReadAllTextAsync(filePath, cancellationToken);
+            return this.Deserialize<T>(json);
         }
     }
 }

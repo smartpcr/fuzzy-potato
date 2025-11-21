@@ -11,7 +11,7 @@ namespace FuzzyPotato.Core.Serialization
     using FuzzyPotato.Core.Models;
 
     /// <summary>
-    /// YAML serializer with polymorphic support.
+    /// YAML serializer with polymorphic support via TypeRegistry.
     /// </summary>
     public class FuzzyYamlSerializer
     {
@@ -29,14 +29,16 @@ namespace FuzzyPotato.Core.Serialization
         {
             var serializerBuilder = new SerializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .WithTypeConverter(new PolymorphicYamlTypeConverter());
+                .WithTypeInspector(inner => new PolymorphicYamlSerializingTypeInspector(inner));
 
             configureSerializer?.Invoke(serializerBuilder);
             this._serializer = serializerBuilder.Build();
 
             var deserializerBuilder = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
-                .WithTypeConverter(new PolymorphicYamlTypeConverter());
+                .WithNodeDeserializer(
+                    inner => new PolymorphicYamlNodeDeserializer(inner),
+                    syntax => syntax.InsteadOf<YamlDotNet.Serialization.NodeDeserializers.ObjectNodeDeserializer>());
 
             configureDeserializer?.Invoke(deserializerBuilder);
             this._deserializer = deserializerBuilder.Build();
@@ -44,68 +46,50 @@ namespace FuzzyPotato.Core.Serialization
 
         /// <summary>
         /// Serializes an object to YAML string.
+        /// Polymorphic types registered with TypeRegistry automatically include $type discriminator.
         /// </summary>
         /// <typeparam name="T">The type of object to serialize.</typeparam>
         /// <param name="value">The object to serialize.</param>
         /// <returns>YAML string representation.</returns>
-        public string Serialize<T>(T value) where T : PolymorphicBase
+        public string Serialize<T>(T value)
         {
-            var wrapper = new PolymorphicWrapper
-            {
-                Type = TypeRegistry.GetDiscriminator(value.GetType()) ?? value.GetType().Name,
-                Data = value,
-            };
-            return this._serializer.Serialize(wrapper);
+            return this._serializer.Serialize(value);
         }
 
         /// <summary>
-        /// Serializes a collection of polymorphic objects to YAML string.
+        /// Serializes a collection of objects to YAML string.
+        /// Polymorphic types registered with TypeRegistry automatically include $type discriminator.
         /// </summary>
+        /// <typeparam name="T">The base type of collection items.</typeparam>
         /// <param name="values">The collection to serialize.</param>
         /// <returns>YAML string representation.</returns>
-        public string SerializeCollection(IEnumerable<PolymorphicBase> values)
+        public string SerializeCollection<T>(IEnumerable<T> values)
         {
-            var wrappers = values.Select(v => new PolymorphicWrapper
-            {
-                Type = TypeRegistry.GetDiscriminator(v.GetType()) ?? v.GetType().Name,
-                Data = v,
-            }).ToList();
-
-            return this._serializer.Serialize(wrappers);
+            return this._serializer.Serialize(values);
         }
 
         /// <summary>
         /// Deserializes YAML string to an object.
+        /// Polymorphic types are automatically resolved using $type discriminator and TypeRegistry.
         /// </summary>
         /// <typeparam name="T">The expected type.</typeparam>
         /// <param name="yaml">The YAML string.</param>
         /// <returns>Deserialized object.</returns>
-        public T? Deserialize<T>(string yaml) where T : PolymorphicBase
+        public T? Deserialize<T>(string yaml)
         {
-            var wrapper = this._deserializer.Deserialize<PolymorphicWrapper>(yaml);
-            return wrapper?.Data as T;
+            return this._deserializer.Deserialize<T>(yaml);
         }
 
         /// <summary>
-        /// Deserializes YAML string to a polymorphic base object.
+        /// Deserializes YAML string to a collection of objects.
+        /// Polymorphic types are automatically resolved using $type discriminator and TypeRegistry.
         /// </summary>
-        /// <param name="yaml">The YAML string.</param>
-        /// <returns>Deserialized object.</returns>
-        public PolymorphicBase? DeserializePolymorphic(string yaml)
-        {
-            var wrapper = this._deserializer.Deserialize<PolymorphicWrapper>(yaml);
-            return wrapper?.Data;
-        }
-
-        /// <summary>
-        /// Deserializes YAML string to a collection of polymorphic objects.
-        /// </summary>
+        /// <typeparam name="T">The base type of collection items.</typeparam>
         /// <param name="yaml">The YAML string.</param>
         /// <returns>Collection of deserialized objects.</returns>
-        public IEnumerable<PolymorphicBase>? DeserializeCollection(string yaml)
+        public IEnumerable<T>? DeserializeCollection<T>(string yaml)
         {
-            var wrappers = this._deserializer.Deserialize<List<PolymorphicWrapper>>(yaml);
-            return wrappers?.Select(w => w.Data).ToList();
+            return this._deserializer.Deserialize<IEnumerable<T>>(yaml);
         }
 
         /// <summary>
@@ -120,7 +104,6 @@ namespace FuzzyPotato.Core.Serialization
             string filePath,
             T value,
             CancellationToken cancellationToken = default)
-            where T : PolymorphicBase
         {
             var yaml = this.Serialize(value);
             await File.WriteAllTextAsync(filePath, yaml, cancellationToken);
@@ -136,73 +119,9 @@ namespace FuzzyPotato.Core.Serialization
         public async Task<T?> DeserializeFromFileAsync<T>(
             string filePath,
             CancellationToken cancellationToken = default)
-            where T : PolymorphicBase
         {
             var yaml = await File.ReadAllTextAsync(filePath, cancellationToken);
             return this.Deserialize<T>(yaml);
-        }
-
-        // General object serialization methods (without PolymorphicBase constraint)
-
-        /// <summary>
-        /// Serializes any object to YAML string.
-        /// </summary>
-        /// <typeparam name="T">The type of object to serialize.</typeparam>
-        /// <param name="value">The object to serialize.</param>
-        /// <returns>YAML string representation.</returns>
-        public string SerializeObject<T>(T value)
-        {
-            return this._serializer.Serialize(value);
-        }
-
-        /// <summary>
-        /// Deserializes YAML string to any object type.
-        /// </summary>
-        /// <typeparam name="T">The expected type.</typeparam>
-        /// <param name="yaml">The YAML string.</param>
-        /// <returns>Deserialized object.</returns>
-        public T? DeserializeObject<T>(string yaml)
-        {
-            return this._deserializer.Deserialize<T>(yaml);
-        }
-
-        /// <summary>
-        /// Serializes any object to a YAML file.
-        /// </summary>
-        /// <typeparam name="T">The type of object to serialize.</typeparam>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="value">The object to serialize.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        public async Task SerializeObjectToFileAsync<T>(
-            string filePath,
-            T value,
-            CancellationToken cancellationToken = default)
-        {
-            var yaml = this.SerializeObject(value);
-            await File.WriteAllTextAsync(filePath, yaml, cancellationToken);
-        }
-
-        /// <summary>
-        /// Deserializes a YAML file to any object type.
-        /// </summary>
-        /// <typeparam name="T">The expected type.</typeparam>
-        /// <param name="filePath">The file path.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Deserialized object.</returns>
-        public async Task<T?> DeserializeObjectFromFileAsync<T>(
-            string filePath,
-            CancellationToken cancellationToken = default)
-        {
-            var yaml = await File.ReadAllTextAsync(filePath, cancellationToken);
-            return this.DeserializeObject<T>(yaml);
-        }
-
-        private class PolymorphicWrapper
-        {
-            public string Type { get; set; } = string.Empty;
-
-            public PolymorphicBase Data { get; set; } = null!;
         }
     }
 }

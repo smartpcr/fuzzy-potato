@@ -10,10 +10,17 @@ namespace FuzzyPotato.Core.Tests.Examples
     using FuzzyPotato.Core.Models;
 
     /// <summary>
+    /// Base class for document examples.
+    /// Demonstrates polymorphic serialization using TypeRegistry.
+    /// </summary>
+    public abstract class DocumentBase : PolymorphicBase
+    {
+    }
+
+    /// <summary>
     /// Example: Document with text content.
     /// </summary>
-    [JsonDerivedType(typeof(TextDocument), typeDiscriminator: "text-document")]
-    public class TextDocument : PolymorphicBase
+    public class TextDocument : DocumentBase
     {
         /// <summary>
         /// Gets or sets the document content.
@@ -34,8 +41,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Example: Image document.
     /// </summary>
-    [JsonDerivedType(typeof(ImageDocument), typeDiscriminator: "image-document")]
-    public class ImageDocument : PolymorphicBase
+    public class ImageDocument : DocumentBase
     {
         /// <summary>
         /// Gets or sets the image URL.
@@ -61,8 +67,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Example: Video document.
     /// </summary>
-    [JsonDerivedType(typeof(VideoDocument), typeDiscriminator: "video-document")]
-    public class VideoDocument : PolymorphicBase
+    public class VideoDocument : DocumentBase
     {
         /// <summary>
         /// Gets or sets the video URL.

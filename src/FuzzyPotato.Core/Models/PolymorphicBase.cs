@@ -10,10 +10,8 @@ namespace FuzzyPotato.Core.Models
 
     /// <summary>
     /// Base class for polymorphic serialization support.
-    /// Derived classes must specify their type discriminator.
+    /// Derived classes must specify their type discriminator using JsonDerivedType attributes.
     /// </summary>
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-    [JsonDerivedType(typeof(PolymorphicBase), typeDiscriminator: "base")]
     public abstract class PolymorphicBase
     {
         /// <summary>

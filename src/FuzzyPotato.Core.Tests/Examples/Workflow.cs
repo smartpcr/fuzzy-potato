@@ -13,8 +13,8 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Base class for all node definitions in a workflow.
     /// Each node type has specific properties for configuration.
+    /// Types are registered with TypeRegistry for polymorphic serialization.
     /// </summary>
-    [JsonDerivedType(typeof(NodeDefinition), typeDiscriminator: "base-node")]
     public abstract class NodeDefinition : PolymorphicBase
     {
         /// <summary>
@@ -41,7 +41,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that executes C# code.
     /// </summary>
-    [JsonDerivedType(typeof(CSharpNode), typeDiscriminator: "csharp-node")]
     public class CSharpNode : NodeDefinition
     {
         /// <summary>
@@ -68,7 +67,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that executes PowerShell scripts.
     /// </summary>
-    [JsonDerivedType(typeof(PowerShellScriptNode), typeDiscriminator: "powershell-node")]
     public class PowerShellScriptNode : NodeDefinition
     {
         /// <summary>
@@ -95,7 +93,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that represents a while loop in the workflow.
     /// </summary>
-    [JsonDerivedType(typeof(WhileLoopNode), typeDiscriminator: "while-loop-node")]
     public class WhileLoopNode : NodeDefinition
     {
         /// <summary>
@@ -122,7 +119,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that represents conditional branching.
     /// </summary>
-    [JsonDerivedType(typeof(IfElseNode), typeDiscriminator: "if-else-node")]
     public class IfElseNode : NodeDefinition
     {
         /// <summary>
@@ -144,7 +140,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that performs HTTP requests.
     /// </summary>
-    [JsonDerivedType(typeof(HttpRequestNode), typeDiscriminator: "http-request-node")]
     public class HttpRequestNode : NodeDefinition
     {
         /// <summary>
@@ -181,7 +176,6 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Node that delays execution.
     /// </summary>
-    [JsonDerivedType(typeof(DelayNode), typeDiscriminator: "delay-node")]
     public class DelayNode : NodeDefinition
     {
         /// <summary>

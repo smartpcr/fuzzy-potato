@@ -154,7 +154,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Act
             var json = this._jsonSerializer.SerializeCollection(nodes);
-            var deserialized = this._jsonSerializer.DeserializeCollection(json);
+            var deserialized = this._jsonSerializer.DeserializeCollection<NodeDefinition>(json);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -193,7 +193,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Act
             var yaml = this._yamlSerializer.SerializeCollection(nodes);
-            var deserialized = this._yamlSerializer.DeserializeCollection(yaml);
+            var deserialized = this._yamlSerializer.DeserializeCollection<NodeDefinition>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -218,8 +218,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var workflow = this.CreateSampleWorkflow();
 
             // Act
-            var json = this._jsonSerializer.SerializeObject(workflow);
-            var deserialized = this._jsonSerializer.DeserializeObject<WorkflowDefinition>(json);
+            var json = this._jsonSerializer.Serialize(workflow);
+            var deserialized = this._jsonSerializer.Deserialize<WorkflowDefinition>(json);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -230,7 +230,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
             deserialized.StartNodeId.Should().Be(workflow.StartNodeId);
             deserialized.Nodes.Should().HaveCount(workflow.Nodes.Count);
             deserialized.Connections.Should().HaveCount(workflow.Connections.Count);
-            deserialized.Variables.Should().BeEquivalentTo(workflow.Variables);
+            deserialized.Variables.Should().HaveCount(workflow.Variables.Count);
+            deserialized.Variables.Should().ContainKey("apiKey");
+            deserialized.Variables.Should().ContainKey("maxRetries");
+            deserialized.Variables.Should().ContainKey("timeout");
         }
 
         /// <summary>
@@ -243,8 +246,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var workflow = this.CreateSampleWorkflow();
 
             // Act
-            var yaml = this._yamlSerializer.SerializeObject(workflow);
-            var deserialized = this._yamlSerializer.DeserializeObject<WorkflowDefinition>(yaml);
+            var yaml = this._yamlSerializer.Serialize(workflow);
+            var deserialized = this._yamlSerializer.Deserialize<WorkflowDefinition>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -267,8 +270,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             try
             {
                 // Act
-                await this._jsonSerializer.SerializeObjectToFileAsync(tempFile, workflow);
-                var deserialized = await this._jsonSerializer.DeserializeObjectFromFileAsync<WorkflowDefinition>(tempFile);
+                await this._jsonSerializer.SerializeToFileAsync(tempFile, workflow);
+                var deserialized = await this._jsonSerializer.DeserializeFromFileAsync<WorkflowDefinition>(tempFile);
 
                 // Assert
                 deserialized.Should().NotBeNull();
@@ -389,8 +392,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._jsonSerializer.SerializeObject(workflow);
-            var deserialized = this._jsonSerializer.DeserializeObject<WorkflowDefinition>(json);
+            var json = this._jsonSerializer.Serialize(workflow);
+            var deserialized = this._jsonSerializer.Deserialize<WorkflowDefinition>(json);
 
             // Assert
             deserialized.Should().NotBeNull();

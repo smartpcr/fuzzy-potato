@@ -15,7 +15,11 @@
       "WebSearch",
       "Bash(find . -type d ( -name \"bin\" -o -name \"obj\" ) -exec rm -rf {} +)",
       "Bash(dotnet list package:*)",
-      "Bash(dotnet list:*)"
+      "Bash(dotnet list:*)",
+      "Bash(dotnet --version:*)",
+      "Bash(dotnet --list-sdks:*)",
+      "Bash(find:*)",
+      "Bash(pkill:*)"
     ],
     "deny": [],
     "ask": []

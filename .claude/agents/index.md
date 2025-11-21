@@ -8,6 +8,7 @@ Welcome to the FuzzyPotato project context documentation. This knowledge base he
 
 ```
 .claude/
+├── CLAUDE.md        # Instructions for maintaining this documentation system ⭐
 ├── agents/          # Context documentation for AI assistants
 │   ├── index.md           ← You are here
 │   ├── architecture.md
@@ -20,6 +21,15 @@ Welcome to the FuzzyPotato project context documentation. This knowledge base he
     ├── template.md
     └── {year}/{month}/{date}.md
 ```
+
+### Meta Documentation
+
+**[.claude/CLAUDE.md](../CLAUDE.md)** - Instructions for Claude Code on maintaining this documentation system
+- When to update prompt history
+- How to structure session notes
+- Documentation quality standards
+- Cross-referencing guidelines
+- **Read this first to understand the documentation workflow**
 
 ### Core Documents
 
@@ -72,23 +82,35 @@ Welcome to the FuzzyPotato project context documentation. This knowledge base he
 ## 🔗 Cross-Reference Map
 
 ```
-┌─────────────────┐
-│     index.md    │ ◄─── You are here
-└────────┬────────┘
-         │
-    ┌────┴────┬──────────┬─────────────┬──────────────┐
-    │         │          │             │              │
-┌───▼────┐ ┌─▼──────┐ ┌─▼─────────┐ ┌─▼──────────┐ ┌─▼──────────┐
-│ arch-  │ │ design │ │ patterns  │ │ test-      │ │ usage-     │
-│ itect- │ │ .md    │ │ .md       │ │ strategy   │ │ guide.md   │
-│ ure.md │ └────────┘ └───────────┘ │ .md        │ └────────────┘
-└────────┘      │            │       └────────────┘        │
-                │            │             │               │
-                └────────────┴─────────────┴───────────────┘
-                        References each other
+                    ┌──────────────────────┐
+                    │  .claude/CLAUDE.md   │ ◄─── Meta documentation
+                    │  (Documentation)     │      (how to maintain docs)
+                    │  (maintenance guide) │
+                    └──────────┬───────────┘
+                               │
+                    ┌──────────▼───────────┐
+                    │     index.md         │ ◄─── You are here
+                    └──────────┬───────────┘
+                               │
+            ┌──────────────────┼──────────────────┬─────────────┬──────────────┐
+            │                  │                  │             │              │
+      ┌─────▼─────┐      ┌────▼──────┐     ┌─────▼────────┐ ┌─▼──────────┐ ┌─▼──────────┐
+      │ arch-     │      │ design    │     │ patterns     │ │ test-      │ │ usage-     │
+      │ itect-    │      │ .md       │     │ .md          │ │ strategy   │ │ guide.md   │
+      │ ure.md    │      └───────────┘     └──────────────┘ │ .md        │ └────────────┘
+      └───────────┘            │                  │          └────────────┘        │
+                               │                  │                │               │
+                               └──────────────────┴────────────────┴───────────────┘
+                                       References each other
 ```
 
 ## 🎯 When to Use Each Document
+
+### For Maintaining Documentation
+1. **START HERE**: Read [.claude/CLAUDE.md](../CLAUDE.md) to understand the documentation system
+2. Follow the guidelines for updating prompt history
+3. Use the templates provided for consistency
+4. Maintain cross-references between documents
 
 ### For Architecture Changes
 1. Start with [Architecture](./architecture.md) to understand current structure
@@ -134,6 +156,7 @@ When making changes:
 
 ## 📋 Quick Reference Links
 
+- **Documentation System**: See [.claude/CLAUDE.md](../CLAUDE.md) - **Start here for maintaining docs**
 - **Build & Run**: See [Architecture - Build System](./architecture.md#build-system)
 - **Code Style**: See [Patterns - EditorConfig Compliance](./patterns.md#-critical-editorconfig-compliance)
 - **Testing**: See [Test Strategy](./test-strategy.md)
@@ -143,13 +166,19 @@ When making changes:
 
 ## 🚀 Project Status
 
-- **Current Phase**: Workflow serialization implementation complete
-- **Latest Features**:
-  - Workflow node hierarchy with 6 node types
-  - NodeFactory pattern for runtime instantiation
-  - Comprehensive test coverage
-  - Extended serializers for non-polymorphic types
-- **Next Steps**: See main README.md
+- **Current Phase**: Production-ready polymorphic serialization library
+- **Latest Achievements** (Session 4):
+  - ✅ Custom converter architecture for robust polymorphic serialization
+  - ✅ TypeRegistry-based runtime type resolution
+  - ✅ Nested polymorphic collections fully supported
+  - ✅ All 24 tests passing (JSON + YAML)
+  - ✅ Works across assembly boundaries
+  - ✅ Comprehensive documentation system established
+- **Key Files**:
+  - `PolymorphicJsonConverter.cs` - Custom JSON converter
+  - `PolymorphicYamlTypeInspector.cs` - Custom YAML deserializer
+  - `.claude/CLAUDE.md` - Documentation maintenance guide
+- **Status**: 🎉 **Production Ready**
 
 ---
 

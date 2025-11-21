@@ -1,27 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "Bash(dotnet new:*)",
-      "Bash(dotnet sln:*)",
-      "Bash(dotnet restore:*)",
-      "Bash(dotnet build:*)",
-      "Bash(tree:*)",
-      "Bash(dotnet test:*)",
-      "Bash(dotnet clean:*)",
-      "Bash(xargs rm -rf)",
-      "Bash(cat:*)",
-      "WebSearch",
-      "Bash(find . -type d ( -name \"bin\" -o -name \"obj\" ) -exec rm -rf {} +)",
-      "Bash(dotnet list package:*)",
-      "Bash(dotnet list:*)",
-      "Bash(dotnet --version:*)",
-      "Bash(dotnet --list-sdks:*)",
-      "Bash(find:*)",
-      "Bash(pkill:*)"
+      "*"
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "Start": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '\n📚 Remember to review:\n- docs/*.md\n- .claude/agents/*.md\n- .claude/prompts/README.md'"
+          }
+        ]
+      }
+    ]
   }
 }

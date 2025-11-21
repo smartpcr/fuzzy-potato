@@ -1,0 +1,49 @@
+<Project>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+
+  <!-- Test projects on non-Windows platforms should target only net8.0 -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true' and '$(OS)' != 'Windows_NT'">
+    <TargetFrameworks>net8.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <!-- Test projects configuration -->
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <!-- Test project dependencies -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <PackageReference Include="MSTest.TestAdapter" />
+    <PackageReference Include="MSTest.TestFramework" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+  <!-- Packaging configuration -->
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <Product>FuzzyPotato</Product>
+    <Authors>Xiaodong Li</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Company>FuzzyPotato</Company>
+    <RepositoryUrl>https://github.com/crp/fuzzy-potato</RepositoryUrl>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+  </PropertyGroup>
+</Project>

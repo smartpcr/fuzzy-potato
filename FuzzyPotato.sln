@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{1F76C058-7D38-4A52-A34A-136819501333}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzyPotato.Core", "src\FuzzyPotato.Core\FuzzyPotato.Core.csproj", "{83992028-EF1D-4F76-9D5A-F89418164B41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FuzzyPotato.Core.Tests", "src\FuzzyPotato.Core.Tests\FuzzyPotato.Core.Tests.csproj", "{0DB64034-34B0-49B5-B034-0E5A373EF3B0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83992028-EF1D-4F76-9D5A-F89418164B41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83992028-EF1D-4F76-9D5A-F89418164B41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83992028-EF1D-4F76-9D5A-F89418164B41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83992028-EF1D-4F76-9D5A-F89418164B41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DB64034-34B0-49B5-B034-0E5A373EF3B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DB64034-34B0-49B5-B034-0E5A373EF3B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DB64034-34B0-49B5-B034-0E5A373EF3B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DB64034-34B0-49B5-B034-0E5A373EF3B0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{83992028-EF1D-4F76-9D5A-F89418164B41} = {1F76C058-7D38-4A52-A34A-136819501333}
+		{0DB64034-34B0-49B5-B034-0E5A373EF3B0} = {1F76C058-7D38-4A52-A34A-136819501333}
+	EndGlobalSection
+EndGlobal

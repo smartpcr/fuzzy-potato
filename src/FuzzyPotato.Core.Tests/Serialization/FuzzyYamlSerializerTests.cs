@@ -7,8 +7,8 @@
 namespace FuzzyPotato.Core.Tests.Serialization
 {
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Models.Examples;
     using FuzzyPotato.Core.Serialization;
+    using FuzzyPotato.Core.Tests.Examples;
 
     [TestClass]
     public class FuzzyYamlSerializerTests

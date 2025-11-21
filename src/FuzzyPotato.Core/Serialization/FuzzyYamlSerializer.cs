@@ -142,6 +142,62 @@ namespace FuzzyPotato.Core.Serialization
             return this.Deserialize<T>(yaml);
         }
 
+        // General object serialization methods (without PolymorphicBase constraint)
+
+        /// <summary>
+        /// Serializes any object to YAML string.
+        /// </summary>
+        /// <typeparam name="T">The type of object to serialize.</typeparam>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>YAML string representation.</returns>
+        public string SerializeObject<T>(T value)
+        {
+            return this._serializer.Serialize(value);
+        }
+
+        /// <summary>
+        /// Deserializes YAML string to any object type.
+        /// </summary>
+        /// <typeparam name="T">The expected type.</typeparam>
+        /// <param name="yaml">The YAML string.</param>
+        /// <returns>Deserialized object.</returns>
+        public T? DeserializeObject<T>(string yaml)
+        {
+            return this._deserializer.Deserialize<T>(yaml);
+        }
+
+        /// <summary>
+        /// Serializes any object to a YAML file.
+        /// </summary>
+        /// <typeparam name="T">The type of object to serialize.</typeparam>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="value">The object to serialize.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task SerializeObjectToFileAsync<T>(
+            string filePath,
+            T value,
+            CancellationToken cancellationToken = default)
+        {
+            var yaml = this.SerializeObject(value);
+            await File.WriteAllTextAsync(filePath, yaml, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deserializes a YAML file to any object type.
+        /// </summary>
+        /// <typeparam name="T">The expected type.</typeparam>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Deserialized object.</returns>
+        public async Task<T?> DeserializeObjectFromFileAsync<T>(
+            string filePath,
+            CancellationToken cancellationToken = default)
+        {
+            var yaml = await File.ReadAllTextAsync(filePath, cancellationToken);
+            return this.DeserializeObject<T>(yaml);
+        }
+
         private class PolymorphicWrapper
         {
             public string Type { get; set; } = string.Empty;

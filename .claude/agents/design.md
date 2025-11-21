@@ -1,5 +1,14 @@
 # Design Principles
 
+> **Navigation**: [← Index](./index.md) | [Architecture →](./architecture.md) | [Patterns →](./patterns.md)
+
+**Related Documents**:
+- [Architecture](./architecture.md) - System structure supporting these principles
+- [Patterns](./patterns.md) - Concrete implementations of these principles
+- [Test Strategy](./test-strategy.md) - Testing practices aligned with these principles
+
+---
+
 ## Core Design Philosophy
 
 This project adheres to proven software design principles to ensure maintainability, testability, and scalability.
@@ -169,3 +178,11 @@ This project adheres to proven software design principles to ensure maintainabil
 - Automatic version bumping based on commit height
 - Version tags in Git for releases
 - AssemblyVersion vs. NuGet package version precision
+
+---
+
+> **Navigation**: [← Index](./index.md) | [Architecture →](./architecture.md) | [Patterns →](./patterns.md)
+
+**See Also**:
+- [Patterns](./patterns.md) for concrete pattern implementations
+- [Architecture](./architecture.md) for build and versioning configuration

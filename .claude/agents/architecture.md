@@ -1,5 +1,14 @@
 # Architecture Context
 
+> **Navigation**: [← Index](./index.md) | [Design Principles →](./design.md) | [Patterns →](./patterns.md)
+
+**Related Documents**:
+- [Design Principles](./design.md) - Coding standards that align with this architecture
+- [Patterns](./patterns.md) - Implementation patterns for this architecture
+- [Test Strategy](./test-strategy.md) - Testing approach within this architecture
+
+---
+
 ## Project Structure
 
 This project follows a clean, modular architecture based on the [csharp-template](https://github.com/smartpcr/csharp-template).
@@ -124,3 +133,7 @@ Update these files to customize for your needs:
 - `Directory.Build.props`: Product name, author, company, repository URL
 - `version.json`: Initial version, versioning strategy
 - `.github/workflows/`: CI/CD behavior, triggers, matrix configurations
+
+---
+
+> **Navigation**: [← Index](./index.md) | [Design Principles →](./design.md) | [Patterns →](./patterns.md)

@@ -28,6 +28,7 @@
     <PackageVersion Include="System.Data.SQLite.Core" Version="1.0.119" />
     <!-- JSON Serialization -->
     <PackageVersion Include="System.Text.Json" Version="9.0.7" />
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <!-- YAML Serialization -->
     <PackageVersion Include="YamlDotNet" Version="16.2.1" />
     <!-- CSV Processing -->

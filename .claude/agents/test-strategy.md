@@ -1,5 +1,14 @@
 # Test Strategy
 
+> **Navigation**: [← Index](./index.md) | [Patterns →](./patterns.md) | [Usage Guide →](./usage-guide.md)
+
+**Related Documents**:
+- [Patterns](./patterns.md) - Testing patterns (Object Mother, Test Data Builder)
+- [Design Principles](./design.md) - Testing principles and async guidelines
+- [Architecture](./architecture.md) - Testing framework and CI/CD integration
+
+---
+
 ## Testing Philosophy
 
 This project follows a pragmatic testing approach balancing thoroughness with maintainability.
@@ -413,3 +422,14 @@ public class UserServiceTests
 8. **Maintainable** - refactor tests as code evolves
 9. **Coverage ≠ Quality** - focus on meaningful tests
 10. **Test behavior, not implementation** - avoid brittle tests
+
+---
+
+> **Navigation**: [← Index](./index.md) | [Patterns →](./patterns.md) | [Usage Guide →](./usage-guide.md)
+
+**Key Takeaways**:
+- Follow the AAA pattern for all tests
+- Use FluentAssertions for readable assertions
+- See [Patterns](./patterns.md) for test data builders
+- Maintain >80% code coverage
+- Tests are living documentation

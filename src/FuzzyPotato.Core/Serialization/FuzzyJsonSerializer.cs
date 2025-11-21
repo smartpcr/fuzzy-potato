@@ -122,5 +122,61 @@ namespace FuzzyPotato.Core.Serialization
             await using var stream = File.OpenRead(filePath);
             return await JsonSerializer.DeserializeAsync<T>(stream, this._options, cancellationToken);
         }
+
+        // General object serialization methods (without PolymorphicBase constraint)
+
+        /// <summary>
+        /// Serializes any object to JSON string.
+        /// </summary>
+        /// <typeparam name="T">The type of object to serialize.</typeparam>
+        /// <param name="value">The object to serialize.</param>
+        /// <returns>JSON string representation.</returns>
+        public string SerializeObject<T>(T value)
+        {
+            return JsonSerializer.Serialize(value, this._options);
+        }
+
+        /// <summary>
+        /// Deserializes JSON string to any object type.
+        /// </summary>
+        /// <typeparam name="T">The expected type.</typeparam>
+        /// <param name="json">The JSON string.</param>
+        /// <returns>Deserialized object.</returns>
+        public T? DeserializeObject<T>(string json)
+        {
+            return JsonSerializer.Deserialize<T>(json, this._options);
+        }
+
+        /// <summary>
+        /// Serializes any object to a JSON file.
+        /// </summary>
+        /// <typeparam name="T">The type of object to serialize.</typeparam>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="value">The object to serialize.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task SerializeObjectToFileAsync<T>(
+            string filePath,
+            T value,
+            CancellationToken cancellationToken = default)
+        {
+            await using var stream = File.Create(filePath);
+            await JsonSerializer.SerializeAsync(stream, value, this._options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deserializes a JSON file to any object type.
+        /// </summary>
+        /// <typeparam name="T">The expected type.</typeparam>
+        /// <param name="filePath">The file path.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Deserialized object.</returns>
+        public async Task<T?> DeserializeObjectFromFileAsync<T>(
+            string filePath,
+            CancellationToken cancellationToken = default)
+        {
+            await using var stream = File.OpenRead(filePath);
+            return await JsonSerializer.DeserializeAsync<T>(stream, this._options, cancellationToken);
+        }
     }
 }

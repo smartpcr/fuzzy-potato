@@ -4,9 +4,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace FuzzyPotato.Core.Models.Examples
+namespace FuzzyPotato.Core.Tests.Examples
 {
     using System.Text.Json.Serialization;
+    using FuzzyPotato.Core.Models;
 
     /// <summary>
     /// Example: Document with text content.

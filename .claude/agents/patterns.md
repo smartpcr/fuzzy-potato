@@ -1,5 +1,15 @@
 # Design Patterns & Best Practices
 
+> **Navigation**: [← Index](./index.md) | [Design Principles →](./design.md) | [Test Strategy →](./test-strategy.md)
+
+**Related Documents**:
+- [Design Principles](./design.md) - Foundational principles behind these patterns
+- [Architecture](./architecture.md) - Project structure for organizing patterns
+- [Test Strategy](./test-strategy.md) - Testing patterns and practices
+- [Usage Guide](./usage-guide.md) - Real-world pattern usage examples
+
+---
+
 ## ⚠️ CRITICAL: EditorConfig Compliance
 
 **ALWAYS follow the coding patterns defined in `.editorconfig`**
@@ -403,3 +413,13 @@ public class UserBuilder
     public User Build() => new() { Id = _id, Email = _email, Name = _name };
 }
 ```
+
+---
+
+> **Navigation**: [← Index](./index.md) | [Design Principles →](./design.md) | [Test Strategy →](./test-strategy.md)
+
+**Key Takeaways**:
+- **ALWAYS** check EditorConfig compliance first
+- Reference [Design Principles](./design.md) for SOLID alignment
+- See [Test Strategy](./test-strategy.md) for testing patterns
+- Check [Usage Guide](./usage-guide.md) for usage examples

@@ -1,5 +1,15 @@
 # Usage Guide
 
+> **Navigation**: [← Index](./index.md) | [Architecture →](./architecture.md) | [Test Strategy →](./test-strategy.md)
+
+**Related Documents**:
+- [Architecture](./architecture.md) - Build and deployment details
+- [Patterns](./patterns.md) - Implementation patterns used in examples
+- [Test Strategy](./test-strategy.md) - How to test your usage
+- [Design Principles](./design.md) - Best practices for API usage
+
+---
+
 ## Getting Started
 
 ### Prerequisites
@@ -478,3 +488,13 @@ public class PerformanceTests
 - [Moq Documentation](https://github.com/devlooped/moq)
 - [FluentAssertions Documentation](https://fluentassertions.com/introduction)
 - [Nerdbank.GitVersioning](https://github.com/dotnet/Nerdbank.GitVersioning)
+
+---
+
+> **Navigation**: [← Index](./index.md) | [Architecture →](./architecture.md) | [Test Strategy →](./test-strategy.md)
+
+**Quick Links**:
+- See [Architecture](./architecture.md) for build system details
+- See [Patterns](./patterns.md) for design patterns used in examples
+- See [Test Strategy](./test-strategy.md) for testing guidelines
+- Check [Prompt History](../prompts/) for development timeline

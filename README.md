@@ -24,7 +24,7 @@ dotnet add package FuzzyPotato.Core
 ### Basic Usage
 
 ```csharp
-using FuzzyPotato.Core.Models.Examples;
+using FuzzyPotato.Core.Models;
 using FuzzyPotato.Core.Serialization;
 
 // Create polymorphic objects
@@ -185,15 +185,237 @@ var yaml = yamlSerializer.Serialize(custom);
 | `GetAllTypes()` | Gets all registered types |
 | `Clear()` | Clears all registrations |
 
-## Built-in Examples
+## Example Implementations
 
-FuzzyPotato includes example document types:
+The test project (`src/FuzzyPotato.Core.Tests/Examples/`) includes reference implementations showing how to use FuzzyPotato:
 
-- **TextDocument**: Text content with word count and language
-- **ImageDocument**: Images with URL, dimensions, and format
-- **VideoDocument**: Videos with URL, duration, resolution, and codec
+- **Document.cs**: Example document types (TextDocument, ImageDocument, VideoDocument)
+- **Workflow.cs**: Workflow node definitions demonstrating complex polymorphic hierarchies
+- **WorkflowRuntime.cs**: NodeFactory pattern and runtime execution examples
 
-These serve as examples and can be used in your applications.
+These examples demonstrate best practices and can be used as templates for your own implementations. See the test files for complete usage examples.
+
+## Workflow Serialization Example
+
+FuzzyPotato is perfect for complex scenarios like workflow engines where you need to serialize/deserialize polymorphic node hierarchies.
+
+> **Full Implementation**: See `src/FuzzyPotato.Core.Tests/Examples/Workflow.cs` and `WorkflowRuntime.cs` for the complete working implementation.
+
+### Workflow Node Types
+
+```csharp
+// Base class for all workflow nodes
+public abstract class NodeDefinition : PolymorphicBase
+{
+    public string Description { get; set; }
+    public double PositionX { get; set; }
+    public double PositionY { get; set; }
+    public bool Enabled { get; set; }
+}
+
+// Specific node types
+public class CSharpNode : NodeDefinition
+{
+    public string Code { get; set; }
+    public List<string> Usings { get; set; }
+    public int TimeoutMs { get; set; }
+}
+
+public class PowerShellScriptNode : NodeDefinition
+{
+    public string Script { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
+}
+
+public class IfElseNode : NodeDefinition
+{
+    public string Condition { get; set; }
+    public string TrueNodeId { get; set; }
+    public string FalseNodeId { get; set; }
+}
+
+public class WhileLoopNode : NodeDefinition
+{
+    public string Condition { get; set; }
+    public int MaxIterations { get; set; }
+    public string LoopBodyStartNodeId { get; set; }
+}
+```
+
+### Workflow Definition
+
+```csharp
+public class WorkflowDefinition
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public List<NodeDefinition> Nodes { get; set; } // Polymorphic!
+    public List<WorkflowConnection> Connections { get; set; }
+    public string StartNodeId { get; set; }
+    public Dictionary<string, object> Variables { get; set; }
+}
+```
+
+### Creating and Serializing a Workflow
+
+```csharp
+// Register node types for YAML
+TypeRegistry.Register<CSharpNode>("csharp-node");
+TypeRegistry.Register<PowerShellScriptNode>("powershell-node");
+TypeRegistry.Register<IfElseNode>("if-else-node");
+TypeRegistry.Register<WhileLoopNode>("while-loop-node");
+TypeRegistry.Register<HttpRequestNode>("http-request-node");
+TypeRegistry.Register<DelayNode>("delay-node");
+
+// Create a workflow with different node types
+var workflow = new WorkflowDefinition
+{
+    Id = "data-pipeline",
+    Name = "Data Processing Pipeline",
+    StartNodeId = "fetch-data",
+    Nodes = new List<NodeDefinition>
+    {
+        new HttpRequestNode
+        {
+            Id = "fetch-data",
+            Name = "Fetch from API",
+            Method = "GET",
+            Url = "https://api.example.com/data",
+            Headers = new Dictionary<string, string>
+            {
+                ["Authorization"] = "Bearer token"
+            }
+        },
+        new IfElseNode
+        {
+            Id = "check-response",
+            Name = "Validate Response",
+            Condition = "response.StatusCode == 200",
+            TrueNodeId = "process-data",
+            FalseNodeId = "error-handler"
+        },
+        new CSharpNode
+        {
+            Id = "process-data",
+            Name = "Transform Data",
+            Code = "var result = data.Select(x => x.Transform());",
+            Usings = new List<string> { "System", "System.Linq" }
+        },
+        new WhileLoopNode
+        {
+            Id = "batch-loop",
+            Name = "Process Batches",
+            Condition = "hasMoreBatches",
+            MaxIterations = 100,
+            LoopBodyStartNodeId = "process-batch"
+        }
+    },
+    Connections = new List<WorkflowConnection>
+    {
+        new() { SourceNodeId = "fetch-data", TargetNodeId = "check-response" },
+        new() { SourceNodeId = "check-response", TargetNodeId = "process-data", Label = "success" },
+        new() { SourceNodeId = "check-response", TargetNodeId = "error-handler", Label = "error" }
+    }
+};
+
+// Serialize to JSON (preserves all polymorphic types!)
+var jsonSerializer = new FuzzyJsonSerializer();
+var json = jsonSerializer.SerializeObject(workflow);
+await jsonSerializer.SerializeObjectToFileAsync("workflow.json", workflow);
+
+// Serialize to YAML
+var yamlSerializer = new FuzzyYamlSerializer();
+var yaml = yamlSerializer.SerializeObject(workflow);
+await yamlSerializer.SerializeObjectToFileAsync("workflow.yaml", workflow);
+
+// Deserialize - all node types are correctly restored!
+var loadedWorkflow = await jsonSerializer.DeserializeObjectFromFileAsync<WorkflowDefinition>("workflow.json");
+
+// Each node retains its specific type
+var httpNode = loadedWorkflow.Nodes[0] as HttpRequestNode;
+var ifElseNode = loadedWorkflow.Nodes[1] as IfElseNode;
+var csharpNode = loadedWorkflow.Nodes[2] as CSharpNode;
+```
+
+### NodeFactory Pattern
+
+```csharp
+// Factory creates executable instances from definitions
+public class NodeFactory
+{
+    public IExecutableNode CreateNode(NodeDefinition definition)
+    {
+        // Uses TypeRegistry to determine the correct runtime type
+        return definition switch
+        {
+            CSharpNode n => new CSharpNodeExecutor(n),
+            PowerShellScriptNode n => new PowerShellNodeExecutor(n),
+            IfElseNode n => new IfElseNodeExecutor(n),
+            // ... other types
+            _ => throw new NotSupportedException()
+        };
+    }
+}
+
+// Execute nodes from deserialized workflow
+var factory = new NodeFactory();
+var executableNodes = loadedWorkflow.Nodes
+    .Select(def => factory.CreateNode(def))
+    .ToList();
+
+// Run the workflow
+var context = new WorkflowExecutionContext();
+foreach (var node in executableNodes)
+{
+    var result = await node.ExecuteAsync(context);
+    if (!result.Success) break;
+}
+```
+
+### JSON Output Example
+
+```json
+{
+  "id": "data-pipeline",
+  "name": "Data Processing Pipeline",
+  "nodes": [
+    {
+      "$type": "http-request-node",
+      "id": "fetch-data",
+      "name": "Fetch from API",
+      "method": "GET",
+      "url": "https://api.example.com/data",
+      "headers": {
+        "Authorization": "Bearer token"
+      }
+    },
+    {
+      "$type": "if-else-node",
+      "id": "check-response",
+      "name": "Validate Response",
+      "condition": "response.StatusCode == 200",
+      "trueNodeId": "process-data",
+      "falseNodeId": "error-handler"
+    },
+    {
+      "$type": "csharp-node",
+      "id": "process-data",
+      "name": "Transform Data",
+      "code": "var result = data.Select(x => x.Transform());",
+      "usings": ["System", "System.Linq"]
+    }
+  ]
+}
+```
+
+### Key Benefits for Workflow Systems
+
+1. **Type Safety**: All node types are correctly deserialized to their specific types
+2. **Extensibility**: Easy to add new node types without changing serialization code
+3. **Clean Separation**: Definition (data) separate from execution (runtime)
+4. **Multiple Formats**: Save workflows as JSON or YAML
+5. **Factory Pattern**: Clean instantiation of runtime executors from definitions
 
 ## Advanced Scenarios
 
@@ -236,6 +458,14 @@ var doc2 = await yamlSerializer.DeserializeFromFileAsync<TextDocument>("data.yam
 
 ## Development
 
+> **📚 Developer Documentation**: Comprehensive guides in [`.claude/agents/`](.claude/agents/index.md)
+> - [Architecture](.claude/agents/architecture.md) - Project structure, build system, CI/CD
+> - [Design Principles](.claude/agents/design.md) - SOLID principles, coding standards
+> - [Patterns](.claude/agents/patterns.md) - Implementation patterns ⚠️ **Must read EditorConfig**
+> - [Test Strategy](.claude/agents/test-strategy.md) - Testing approach, coverage targets
+> - [Usage Guide](.claude/agents/usage-guide.md) - Development workflows, IDE setup
+> - [Prompt History](.claude/prompts/) - Development timeline and decisions
+
 ### Prerequisites
 - .NET SDK 8.0 or later
 
@@ -263,9 +493,11 @@ dotnet pack --configuration Release
 fuzzy-potato/
 ├── src/
 │   ├── FuzzyPotato.Core/          # Core library
-│   │   ├── Models/                 # Base and example models
+│   │   ├── Models/                 # PolymorphicBase, TypeRegistry
 │   │   └── Serialization/          # JSON/YAML serializers
 │   └── FuzzyPotato.Core.Tests/    # Unit tests
+│       ├── Examples/               # Example implementations (Document, Workflow)
+│       └── Serialization/          # Serialization tests
 ├── .github/workflows/              # CI/CD pipelines
 ├── Directory.Build.props           # Shared build configuration
 ├── Directory.Packages.props        # Central package management

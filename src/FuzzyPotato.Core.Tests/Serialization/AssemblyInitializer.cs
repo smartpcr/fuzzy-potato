@@ -34,14 +34,14 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 try
                 {
                     var types = assembly.GetTypes()
-                        .Where(t => typeof(PolymorphicBase).IsAssignableFrom(t)
+                        .Where(t => typeof(ModelBase).IsAssignableFrom(t)
                                  && !t.IsAbstract
-                                 && t != typeof(PolymorphicBase));
+                                 && t != typeof(ModelBase));
 
                     foreach (var type in types)
                     {
                         // Create instance to get TypeName
-                        var instance = Activator.CreateInstance(type) as PolymorphicBase;
+                        var instance = Activator.CreateInstance(type) as ModelBase;
                         if (instance != null)
                         {
                             ConverterRegistry.RegisterType(instance.TypeName, type);

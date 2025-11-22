@@ -112,7 +112,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public void SerializeCollection_MixedTypes_PreservesTypes()
         {
             // Arrange
-            var documents = new List<PolymorphicBase>
+            var documents = new List<ModelBase>
             {
                 new TextDocument { Id = "1", Name = "Text", Content = "Sample" },
                 new ImageDocument { Id = "2", Name = "Image", ImageUrl = "http://example.com/img.png", Width = 800 },
@@ -132,7 +132,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public void DeserializeCollection_MixedTypes_ReturnsCorrectTypes()
         {
             // Arrange
-            var documents = new List<PolymorphicBase>
+            var documents = new List<ModelBase>
             {
                 new TextDocument { Id = "1", Name = "Text", Content = "Sample" },
                 new ImageDocument { Id = "2", Name = "Image", ImageUrl = "http://example.com/img.png", Width = 800 },

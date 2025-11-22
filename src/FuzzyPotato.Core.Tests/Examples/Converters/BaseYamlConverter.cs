@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="PolymorphicBaseYamlConverter.cs" company="FuzzyPotato">
+// <copyright file="BaseYamlConverter.cs" company="FuzzyPotato">
 //     Copyright (c) FuzzyPotato. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -19,14 +19,14 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
     /// YAML type converter for PolymorphicBase polymorphic deserialization.
     /// Maps $type discriminator to concrete types using ConverterRegistry.TypeNameToTypeMap.
     /// </summary>
-    public class PolymorphicBaseYamlConverter : IYamlTypeConverter
+    public class BaseYamlConverter : IYamlTypeConverter
     {
 
         /// <inheritdoc/>
         public bool Accepts(Type type)
         {
             // Only accept abstract base types, not concrete types (they have their own converters)
-            return typeof(PolymorphicBase).IsAssignableFrom(type) && type.IsAbstract;
+            return typeof(ModelBase).IsAssignableFrom(type) && type.IsAbstract;
         }
 
         /// <inheritdoc/>
@@ -96,7 +96,7 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
         /// <inheritdoc/>
         public void WriteYaml(IEmitter emitter, object? value, Type type, ObjectSerializer serializer)
         {
-            if (value is not PolymorphicBase polymorphicValue)
+            if (value is not ModelBase polymorphicValue)
             {
                 emitter.Emit(new Scalar(string.Empty));
                 return;

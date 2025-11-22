@@ -10,7 +10,7 @@ namespace FuzzyPotato.Core.Models
     /// Base class for polymorphic serialization support.
     /// Derived classes must specify their type discriminator via the TypeName property.
     /// </summary>
-    public abstract class PolymorphicBase
+    public abstract class ModelBase
     {
         /// <summary>
         /// Gets the type discriminator used for polymorphic serialization.

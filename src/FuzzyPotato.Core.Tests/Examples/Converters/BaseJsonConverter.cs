@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="PolymorphicBaseJsonConverter.cs" company="FuzzyPotato">
+// <copyright file="BaseJsonConverter.cs" company="FuzzyPotato">
 //     Copyright (c) FuzzyPotato. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -16,11 +16,11 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
     /// JSON converter for PolymorphicBase polymorphic deserialization.
     /// Maps $type discriminator to concrete types using ConverterRegistry.TypeNameToTypeMap.
     /// </summary>
-    public class PolymorphicBaseJsonConverter : JsonConverter<PolymorphicBase>
+    public class BaseJsonConverter : JsonConverter<ModelBase>
     {
 
         /// <inheritdoc/>
-        public override PolymorphicBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ModelBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType == JsonTokenType.Null)
             {
@@ -44,11 +44,11 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
 
             // Deserialize to concrete type using its specific converter
             var json = root.GetRawText();
-            return (PolymorphicBase?)JsonSerializer.Deserialize(json, concreteType, options);
+            return (ModelBase?)JsonSerializer.Deserialize(json, concreteType, options);
         }
 
         /// <inheritdoc/>
-        public override void Write(Utf8JsonWriter writer, PolymorphicBase value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ModelBase value, JsonSerializerOptions options)
         {
             // Serialize using the concrete type's converter
             JsonSerializer.Serialize(writer, value, value.GetType(), options);

@@ -44,7 +44,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public static IReadOnlyList<JsonConverter> JsonConverters { get; } = new List<JsonConverter>
         {
             // Polymorphic base converter (must be registered first to handle all polymorphic types)
-            new PolymorphicBaseJsonConverter(),
+            new BaseJsonConverter(),
 
             // Document base converter
             new DocumentBaseJsonConverter(),
@@ -87,7 +87,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public static IReadOnlyList<IYamlTypeConverter> YamlConverters { get; } = new List<IYamlTypeConverter>
         {
             // Polymorphic base converter (handles all PolymorphicBase-derived types including DocumentBase and NodeDefinition)
-            new PolymorphicBaseYamlConverter(),
+            new BaseYamlConverter(),
 
             // Document converters
             new TextDocumentYamlConverter(),

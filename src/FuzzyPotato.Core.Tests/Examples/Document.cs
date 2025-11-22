@@ -15,7 +15,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// Demonstrates polymorphic serialization using type-specific converters.
     /// </summary>
     [JsonConverter(typeof(DocumentBaseJsonConverter))]
-    public abstract class DocumentBase : PolymorphicBase
+    public abstract class DocumentBase : ModelBase
     {
     }
 

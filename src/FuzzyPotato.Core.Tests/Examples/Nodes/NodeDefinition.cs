@@ -15,7 +15,7 @@ namespace FuzzyPotato.Core.Tests.Examples.Nodes
     /// Base class for all node definitions in a workflow.
     /// Represents the configuration of a node that can be executed in a workflow engine.
     /// </summary>
-    public abstract class NodeDefinition : PolymorphicBase
+    public abstract class NodeDefinition : ModelBase
     {
         /// <summary>
         /// Gets or sets the unique identifier (hides base class Id property).

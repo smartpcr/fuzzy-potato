@@ -1,8 +1,14 @@
 {
-  "defaultMode": "bypassPermissions",
   "permissions": {
     "allow": [
-      "*"
+      "*",
+      "Bash(dotnet test:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet list:*)",
+      "Bash(xargs basename:*)",
+      "Bash(timeout 30 dotnet test:*)",
+      "Bash(timeout 20 dotnet test:*)"
     ],
     "deny": [],
     "ask": []
@@ -19,5 +25,6 @@
         ]
       }
     ]
-  }
+  },
+  "defaultMode": "bypassPermissions"
 }

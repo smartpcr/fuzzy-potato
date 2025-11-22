@@ -11,6 +11,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     using System.Threading;
     using System.Threading.Tasks;
     using FuzzyPotato.Core.Models;
+    using FuzzyPotato.Core.Tests.Examples.Nodes;
 
     /// <summary>
     /// Context for workflow execution containing runtime state.

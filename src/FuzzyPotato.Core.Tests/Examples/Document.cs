@@ -8,11 +8,13 @@ namespace FuzzyPotato.Core.Tests.Examples
 {
     using System.Text.Json.Serialization;
     using FuzzyPotato.Core.Models;
+    using FuzzyPotato.Core.Tests.Examples.Converters;
 
     /// <summary>
     /// Base class for document examples.
-    /// Demonstrates polymorphic serialization using TypeRegistry.
+    /// Demonstrates polymorphic serialization using type-specific converters.
     /// </summary>
+    [JsonConverter(typeof(DocumentBaseJsonConverter))]
     public abstract class DocumentBase : PolymorphicBase
     {
     }
@@ -20,6 +22,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Example: Document with text content.
     /// </summary>
+    [JsonConverter(typeof(TextDocumentJsonConverter))]
     public class TextDocument : DocumentBase
     {
         /// <inheritdoc/>
@@ -44,6 +47,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Example: Image document.
     /// </summary>
+    [JsonConverter(typeof(ImageDocumentJsonConverter))]
     public class ImageDocument : DocumentBase
     {
         /// <inheritdoc/>
@@ -73,6 +77,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// <summary>
     /// Example: Video document.
     /// </summary>
+    [JsonConverter(typeof(VideoDocumentJsonConverter))]
     public class VideoDocument : DocumentBase
     {
         /// <inheritdoc/>

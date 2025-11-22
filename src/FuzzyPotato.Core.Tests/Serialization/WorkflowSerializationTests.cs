@@ -9,12 +9,16 @@ namespace FuzzyPotato.Core.Tests.Serialization
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
     using FluentAssertions;
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Serialization;
     using FuzzyPotato.Core.Tests.Examples;
+    using FuzzyPotato.Core.Tests.Examples.Nodes;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
 
     /// <summary>
     /// Tests for workflow serialization and deserialization.
@@ -22,8 +26,9 @@ namespace FuzzyPotato.Core.Tests.Serialization
     [TestClass]
     public class WorkflowSerializationTests
     {
-        private FuzzyJsonSerializer _jsonSerializer = null!;
-        private FuzzyYamlSerializer _yamlSerializer = null!;
+        private JsonSerializerOptions _jsonOptions = null!;
+        private ISerializer _yamlSerializer = null!;
+        private IDeserializer _yamlDeserializer = null!;
 
         /// <summary>
         /// Initializes the test class by registering all workflow node types.
@@ -31,13 +36,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            // Register all workflow node types for polymorphic serialization
-            TypeRegistry.Register<CSharpNode>();
-            TypeRegistry.Register<PowerShellScriptNode>();
-            TypeRegistry.Register<WhileLoopNode>();
-            TypeRegistry.Register<IfElseNode>();
-            TypeRegistry.Register<HttpRequestNode>();
-            TypeRegistry.Register<DelayNode>();
+            // Types are automatically discovered via custom converters
+            // No manual registration needed
         }
 
         /// <summary>
@@ -46,8 +46,33 @@ namespace FuzzyPotato.Core.Tests.Serialization
         [TestInitialize]
         public void TestInitialize()
         {
-            this._jsonSerializer = new FuzzyJsonSerializer();
-            this._yamlSerializer = new FuzzyYamlSerializer();
+            this._jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            };
+            foreach (var converter in ConverterRegistry.JsonConverters)
+            {
+                this._jsonOptions.Converters.Add(converter);
+            }
+            this._jsonOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+
+            var serializerBuilder = new SerializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
+            foreach (var converter in ConverterRegistry.YamlConverters)
+            {
+                serializerBuilder = serializerBuilder.WithTypeConverter(converter);
+            }
+            this._yamlSerializer = serializerBuilder.Build();
+
+            var deserializerBuilder = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
+            foreach (var converter in ConverterRegistry.YamlConverters)
+            {
+                deserializerBuilder = deserializerBuilder.WithTypeConverter(converter);
+            }
+            this._yamlDeserializer = deserializerBuilder.Build();
         }
 
         /// <summary>
@@ -72,8 +97,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._jsonSerializer.Serialize(node);
-            var deserialized = this._jsonSerializer.Deserialize<CSharpNode>(json);
+            var json = JsonSerializer.Serialize(node, this._jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<CSharpNode>(json, this._jsonOptions);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -105,7 +130,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Act
             var yaml = this._yamlSerializer.Serialize(node);
-            var deserialized = this._yamlSerializer.Deserialize<CSharpNode>(yaml);
+            var deserialized = this._yamlDeserializer.Deserialize<CSharpNode>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -132,9 +157,9 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 },
                 new PowerShellScriptNode
                 {
-                    Id = "node-2",
-                    Name = "PowerShell Node",
-                    Script = "Write-Host 'Hello'",
+                    NodeId = "node-2",
+                    NodeName = "PowerShell Node",
+                    ScriptPath = "Write-Host 'Hello'",
                     ExecutionPolicy = "RemoteSigned",
                 },
                 new HttpRequestNode
@@ -153,8 +178,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._jsonSerializer.SerializeCollection(nodes);
-            var deserialized = this._jsonSerializer.DeserializeCollection<NodeDefinition>(json);
+            var json = JsonSerializer.Serialize(nodes, this._jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<List<NodeDefinition>>(json, this._jsonOptions);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -192,8 +217,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var yaml = this._yamlSerializer.SerializeCollection(nodes);
-            var deserialized = this._yamlSerializer.DeserializeCollection<NodeDefinition>(yaml);
+            var yaml = this._yamlSerializer.Serialize(nodes);
+            var deserialized = this._yamlDeserializer.Deserialize<List<NodeDefinition>>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -218,8 +243,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var workflow = this.CreateSampleWorkflow();
 
             // Act
-            var json = this._jsonSerializer.Serialize(workflow);
-            var deserialized = this._jsonSerializer.Deserialize<WorkflowDefinition>(json);
+            var json = JsonSerializer.Serialize(workflow, this._jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<WorkflowDefinition>(json, this._jsonOptions);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -247,7 +272,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Act
             var yaml = this._yamlSerializer.Serialize(workflow);
-            var deserialized = this._yamlSerializer.Deserialize<WorkflowDefinition>(yaml);
+            var deserialized = this._yamlDeserializer.Deserialize<WorkflowDefinition>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -270,8 +295,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
             try
             {
                 // Act
-                await this._jsonSerializer.SerializeToFileAsync(tempFile, workflow);
-                var deserialized = await this._jsonSerializer.DeserializeFromFileAsync<WorkflowDefinition>(tempFile);
+                var json = JsonSerializer.Serialize(workflow, this._jsonOptions);
+                await System.IO.File.WriteAllTextAsync(tempFile, json);
+                var fileContent = await System.IO.File.ReadAllTextAsync(tempFile);
+                var deserialized = JsonSerializer.Deserialize<WorkflowDefinition>(fileContent, this._jsonOptions);
 
                 // Assert
                 deserialized.Should().NotBeNull();
@@ -383,7 +410,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
                         Code = "Console.WriteLine(\"False\");",
                     },
                 },
-                Connections = new List<WorkflowConnection>
+                Connections = new List<NodeConnection>
                 {
                     new() { SourceNodeId = "loop-node", TargetNodeId = "condition-node" },
                     new() { SourceNodeId = "condition-node", TargetNodeId = "true-branch", Label = "true" },
@@ -392,8 +419,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._jsonSerializer.Serialize(workflow);
-            var deserialized = this._jsonSerializer.Deserialize<WorkflowDefinition>(json);
+            var json = JsonSerializer.Serialize(workflow, this._jsonOptions);
+            var deserialized = JsonSerializer.Deserialize<WorkflowDefinition>(json, this._jsonOptions);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -470,14 +497,14 @@ namespace FuzzyPotato.Core.Tests.Serialization
                         Description = "Handle error",
                         PositionX = 700,
                         PositionY = 150,
-                        Script = "Write-Error 'Request failed'",
+                        ScriptPath = "Write-Error 'Request failed'",
                         Parameters = new Dictionary<string, object>
                         {
                             ["ErrorMessage"] = "Request failed",
                         },
                     },
                 },
-                Connections = new List<WorkflowConnection>
+                Connections = new List<NodeConnection>
                 {
                     new()
                     {

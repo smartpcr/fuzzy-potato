@@ -7,22 +7,36 @@
 namespace FuzzyPotato.Core.Tests.Serialization
 {
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Serialization;
     using FuzzyPotato.Core.Tests.Examples;
+    using YamlDotNet.Serialization;
+    using YamlDotNet.Serialization.NamingConventions;
 
     [TestClass]
     public class FuzzyYamlSerializerTests
     {
-        private FuzzyYamlSerializer _serializer = null!;
+        private ISerializer _serializer = null!;
+        private IDeserializer _deserializer = null!;
 
         [TestInitialize]
         public void Setup()
         {
-            this._serializer = new FuzzyYamlSerializer();
-            TypeRegistry.Clear();
-            TypeRegistry.Register<TextDocument>();
-            TypeRegistry.Register<ImageDocument>();
-            TypeRegistry.Register<VideoDocument>();
+            var serializerBuilder = new SerializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
+            foreach (var converter in ConverterRegistry.YamlConverters)
+            {
+                serializerBuilder = serializerBuilder.WithTypeConverter(converter);
+            }
+            this._serializer = serializerBuilder.Build();
+
+            var deserializerBuilder = new DeserializerBuilder()
+                .WithNamingConvention(CamelCaseNamingConvention.Instance);
+            foreach (var converter in ConverterRegistry.YamlConverters)
+            {
+                deserializerBuilder = deserializerBuilder.WithTypeConverter(converter);
+            }
+            this._deserializer = deserializerBuilder.Build();
+            // Types are automatically discovered via custom type converters
+            // No manual registration needed
         }
 
         [TestMethod]
@@ -62,7 +76,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var yaml = this._serializer.Serialize(original);
 
             // Act
-            var deserialized = this._serializer.Deserialize<TextDocument>(yaml);
+            var deserialized = this._deserializer.Deserialize<TextDocument>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -85,7 +99,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             var yaml = this._serializer.Serialize(original);
 
             // Act
-            var deserialized = this._serializer.Deserialize<DocumentBase>(yaml);
+            var deserialized = this._deserializer.Deserialize<DocumentBase>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -106,7 +120,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var yaml = this._serializer.SerializeCollection(documents);
+            var yaml = this._serializer.Serialize(documents);
 
             // Assert
             yaml.Should().Contain("text-document");
@@ -124,10 +138,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 new ImageDocument { Id = "2", Name = "Image", ImageUrl = "http://example.com/img.png", Width = 800 },
                 new VideoDocument { Id = "3", Name = "Video", VideoUrl = "http://example.com/vid.mp4", DurationSeconds = 120 },
             };
-            var yaml = this._serializer.SerializeCollection(documents);
+            var yaml = this._serializer.Serialize(documents);
 
             // Act
-            var deserialized = this._serializer.DeserializeCollection<DocumentBase>(yaml)?.ToList();
+            var deserialized = this._deserializer.Deserialize<List<DocumentBase>>(yaml);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -152,7 +166,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             try
             {
                 // Act
-                await this._serializer.SerializeToFileAsync(filePath, document);
+                var yaml = this._serializer.Serialize(document);
+                await File.WriteAllTextAsync(filePath, yaml);
 
                 // Assert
                 File.Exists(filePath).Should().BeTrue();
@@ -182,10 +197,12 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             try
             {
-                await this._serializer.SerializeToFileAsync(filePath, original);
+                var yaml = this._serializer.Serialize(original);
+                await File.WriteAllTextAsync(filePath, yaml);
 
                 // Act
-                var deserialized = await this._serializer.DeserializeFromFileAsync<TextDocument>(filePath);
+                var fileContent = await File.ReadAllTextAsync(filePath);
+                var deserialized = this._deserializer.Deserialize<TextDocument>(fileContent);
 
                 // Assert
                 deserialized.Should().NotBeNull();

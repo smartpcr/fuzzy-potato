@@ -12,7 +12,7 @@ namespace FuzzyPotato.Core.Serialization
     /// <summary>
     /// Event reader that replays buffered parsing events.
     /// </summary>
-    internal class EventReader : IParser
+    public class EventReader : IParser
     {
         private readonly IEnumerator<ParsingEvent> enumerator;
         private ParsingEvent? current;

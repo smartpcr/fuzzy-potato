@@ -9,7 +9,6 @@ namespace FuzzyPotato.Examples
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using FuzzyPotato.Core.Models;
     using FuzzyPotato.Core.Models.Examples;
     using FuzzyPotato.Core.Serialization;
 
@@ -24,8 +23,7 @@ namespace FuzzyPotato.Examples
         /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task RunAsync()
         {
-            // Register all workflow node types for YAML serialization
-            RegisterNodeTypes();
+            // Types are automatically discovered - no manual registration needed
 
             // Create a sample workflow
             var workflow = CreateDataProcessingWorkflow();
@@ -38,18 +36,6 @@ namespace FuzzyPotato.Examples
 
             // Demonstrate node execution
             await DemonstrateNodeExecutionAsync(workflow);
-        }
-
-        private static void RegisterNodeTypes()
-        {
-            TypeRegistry.Register<CSharpNode>();
-            TypeRegistry.Register<PowerShellScriptNode>();
-            TypeRegistry.Register<WhileLoopNode>();
-            TypeRegistry.Register<IfElseNode>();
-            TypeRegistry.Register<HttpRequestNode>();
-            TypeRegistry.Register<DelayNode>();
-
-            Console.WriteLine("✓ Registered all workflow node types\n");
         }
 
         private static WorkflowDefinition CreateDataProcessingWorkflow()

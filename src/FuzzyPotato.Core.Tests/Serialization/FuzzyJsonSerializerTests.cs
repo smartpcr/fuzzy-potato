@@ -6,28 +6,37 @@
 
 namespace FuzzyPotato.Core.Tests.Serialization
 {
+    using System.Text.Json;
+    using System.Text.Json.Serialization;
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Serialization;
     using FuzzyPotato.Core.Tests.Examples;
 
     [TestClass]
     public class FuzzyJsonSerializerTests
     {
-        private FuzzyJsonSerializer _serializer = null!;
+        private JsonSerializerOptions _options = null!;
 
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            // Register types for polymorphic serialization
-            TypeRegistry.Register<TextDocument>();
-            TypeRegistry.Register<ImageDocument>();
-            TypeRegistry.Register<VideoDocument>();
+            // Types are automatically discovered via custom converters
+            // No manual registration needed
         }
 
         [TestInitialize]
         public void Setup()
         {
-            this._serializer = new FuzzyJsonSerializer();
+            this._options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            };
+            foreach (var converter in ConverterRegistry.JsonConverters)
+            {
+                this._options.Converters.Add(converter);
+            }
+            this._options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         }
 
         [TestMethod]
@@ -44,7 +53,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._serializer.Serialize(document);
+            var json = JsonSerializer.Serialize(document, this._options);
 
             // Assert
             json.Should().Contain("\"$type\"");
@@ -64,10 +73,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 WordCount = 2,
                 Language = "en",
             };
-            var json = this._serializer.Serialize(original);
+            var json = JsonSerializer.Serialize(original, this._options);
 
             // Act
-            var deserialized = this._serializer.Deserialize<TextDocument>(json);
+            var deserialized = JsonSerializer.Deserialize<TextDocument>(json, this._options);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -88,10 +97,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 Name = "Sample Text",
                 Content = "Hello, World!",
             };
-            var json = this._serializer.Serialize(original);
+            var json = JsonSerializer.Serialize(original, this._options);
 
             // Act
-            var deserialized = this._serializer.Deserialize<DocumentBase>(json);
+            var deserialized = JsonSerializer.Deserialize<DocumentBase>(json, this._options);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -112,7 +121,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
             };
 
             // Act
-            var json = this._serializer.SerializeCollection(documents);
+            var json = JsonSerializer.Serialize(documents, this._options);
 
             // Assert
             json.Should().Contain("text-document");
@@ -130,10 +139,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 new ImageDocument { Id = "2", Name = "Image", ImageUrl = "http://example.com/img.png", Width = 800 },
                 new VideoDocument { Id = "3", Name = "Video", VideoUrl = "http://example.com/vid.mp4", DurationSeconds = 120 },
             };
-            var json = this._serializer.SerializeCollection(documents);
+            var json = JsonSerializer.Serialize(documents, this._options);
 
             // Act
-            var deserialized = this._serializer.DeserializeCollection<DocumentBase>(json)?.ToList();
+            var deserialized = JsonSerializer.Deserialize<List<DocumentBase>>(json, this._options);
 
             // Assert
             deserialized.Should().NotBeNull();
@@ -158,7 +167,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             try
             {
                 // Act
-                await this._serializer.SerializeToFileAsync(filePath, document);
+                var json = JsonSerializer.Serialize(document, this._options);
+                await File.WriteAllTextAsync(filePath, json);
 
                 // Assert
                 File.Exists(filePath).Should().BeTrue();
@@ -188,10 +198,12 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             try
             {
-                await this._serializer.SerializeToFileAsync(filePath, original);
+                var json = JsonSerializer.Serialize(original, this._options);
+                await File.WriteAllTextAsync(filePath, json);
 
                 // Act
-                var deserialized = await this._serializer.DeserializeFromFileAsync<TextDocument>(filePath);
+                var fileContent = await File.ReadAllTextAsync(filePath);
+                var deserialized = JsonSerializer.Deserialize<TextDocument>(fileContent, this._options);
 
                 // Assert
                 deserialized.Should().NotBeNull();

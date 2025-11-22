@@ -11,7 +11,7 @@ namespace FuzzyPotato.Core.Serialization
     /// <summary>
     /// Collection of parsing events that can be enumerated.
     /// </summary>
-    internal class ParsingEventCollection : IEnumerable<ParsingEvent>
+    public class ParsingEventCollection : IEnumerable<ParsingEvent>
     {
         private readonly List<ParsingEvent> events;
 

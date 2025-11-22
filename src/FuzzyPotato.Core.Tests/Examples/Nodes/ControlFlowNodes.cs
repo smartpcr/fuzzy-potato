@@ -8,6 +8,7 @@ namespace FuzzyPotato.Core.Tests.Examples.Nodes
 {
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
+    using FuzzyPotato.Core.Tests.Examples.Nodes.Converters;
 
     /// <summary>
     /// Node that performs conditional branching based on a boolean expression.

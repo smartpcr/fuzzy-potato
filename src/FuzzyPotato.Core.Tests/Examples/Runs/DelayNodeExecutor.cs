@@ -4,10 +4,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace FuzzyPotato.Core.Tests.Examples
+namespace FuzzyPotato.Core.Tests.Examples.Runs
 {
     using FuzzyPotato.Core.Tests.Examples.Nodes;
-    using FuzzyPotato.Core.Tests.Examples.Runs;
 
     /// <summary>
     /// Executor for delay nodes.

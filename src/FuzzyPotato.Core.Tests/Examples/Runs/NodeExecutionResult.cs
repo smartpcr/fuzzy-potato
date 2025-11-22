@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="WorkflowRuntime.cs" company="FuzzyPotato">
+// <copyright file="NodeExecutionResult.cs" company="FuzzyPotato">
 //     Copyright (c) FuzzyPotato. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------

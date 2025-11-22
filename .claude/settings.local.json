@@ -18,7 +18,8 @@
       "Bash(for file in CSharpScriptNodeJsonConverter.cs CSharpTaskNodeJsonConverter.cs PowerShellScriptNodeJsonConverter.cs PowerShellTaskNodeJsonConverter.cs HttpRequestNodeJsonConverter.cs DelayNodeJsonConverter.cs WhileLoopNodeJsonConverter.cs IfElseNodeJsonConverter.cs ForEachNodeJsonConverter.cs WhileNodeJsonConverter.cs SwitchNodeJsonConverter.cs TimerNodeJsonConverter.cs ContainerNodeJsonConverter.cs SubflowNodeJsonConverter.cs)",
       "Bash(do sed -i '/using System.Text.Json.Serialization;/a\\    using FuzzyPotato.Core.Tests.Examples.Nodes;' \"$file\")",
       "Bash(chmod:*)",
-      "Bash(/tmp/build.sh)"
+      "Bash(/tmp/build.sh)",
+      "Bash(git -C /mnt/e/work/github/crp/fuzzy-potato status --short)"
     ],
     "deny": [],
     "ask": []

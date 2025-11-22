@@ -14,8 +14,10 @@ namespace FuzzyPotato.Core.Tests.Serialization
     using System.Threading.Tasks;
     using FluentAssertions;
     using FuzzyPotato.Core.Models;
+    using FuzzyPotato.Core.Tests.Examples;
     using FuzzyPotato.Core.Tests.Examples.Documents;
     using FuzzyPotato.Core.Tests.Examples.Nodes;
+    using FuzzyPotato.Core.Tests.Examples.Runs;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;

@@ -17,6 +17,15 @@ namespace FuzzyPotato.Core.Tests.Examples
     [JsonConverter(typeof(DocumentBaseJsonConverter))]
     public abstract class DocumentBase : ModelBase
     {
+        /// <summary>
+        /// Gets or sets the unique identifier.
+        /// </summary>
+        public string Id { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
     }
 
     /// <summary>

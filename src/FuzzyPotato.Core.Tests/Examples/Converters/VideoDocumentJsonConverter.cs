@@ -54,9 +54,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
                     case "name":
                         videoDoc.Name = property.Value.GetString() ?? string.Empty;
                         break;
-                    case "createdAt":
-                        videoDoc.CreatedAt = property.Value.GetDateTime();
-                        break;
                 }
             }
 
@@ -74,7 +71,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
             writer.WriteString("codec", value.Codec);
             writer.WriteString("id", value.Id);
             writer.WriteString("name", value.Name);
-            writer.WriteString("createdAt", value.CreatedAt);
             writer.WriteEndObject();
         }
     }

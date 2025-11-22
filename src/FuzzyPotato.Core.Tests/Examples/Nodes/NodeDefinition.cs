@@ -18,34 +18,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Nodes
     public abstract class NodeDefinition : ModelBase
     {
         /// <summary>
-        /// Gets or sets the unique identifier (hides base class Id property).
-        /// </summary>
-        [JsonIgnore]
-        [YamlIgnore]
-        public new string Id
-        {
-            get => this.NodeId;
-            set => this.NodeId = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the name (hides base class Name property).
-        /// </summary>
-        [JsonIgnore]
-        [YamlIgnore]
-        public new string Name
-        {
-            get => this.NodeName;
-            set => this.NodeName = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the creation timestamp (hides base class property).
-        /// </summary>
-        [JsonIgnore]
-        [YamlIgnore]
-        public new System.DateTime CreatedAt { get; set; }
-        /// <summary>
         /// Gets or sets the unique identifier for this node instance.
         /// </summary>
         public string NodeId { get; set; } = string.Empty;

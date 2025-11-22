@@ -152,7 +152,7 @@ namespace FuzzyPotato.Core.Tests.Examples
             var nodes = new Dictionary<string, IExecutableNode>();
             foreach (var nodeDef in workflow.Nodes)
             {
-                nodes[nodeDef.Id] = this.CreateNode(nodeDef);
+                nodes[nodeDef.NodeId] = this.CreateNode(nodeDef);
             }
 
             return nodes;
@@ -176,7 +176,7 @@ namespace FuzzyPotato.Core.Tests.Examples
         }
 
         /// <inheritdoc/>
-        public string NodeId => this.TypedDefinition.Id;
+        public string NodeId => this.TypedDefinition.NodeId;
 
         /// <inheritdoc/>
         public NodeDefinition Definition => this.TypedDefinition;
@@ -213,7 +213,7 @@ namespace FuzzyPotato.Core.Tests.Examples
             WorkflowExecutionContext context,
             CancellationToken cancellationToken = default)
         {
-            context.ExecutionTrace.Add($"Executing C# node: {this.NodeId} - {this.TypedDefinition.Name}");
+            context.ExecutionTrace.Add($"Executing C# node: {this.NodeId} - {this.TypedDefinition.NodeName}");
 
             // Simulated execution - in real implementation, use Roslyn to compile and execute
             await Task.Delay(100, cancellationToken);
@@ -245,7 +245,7 @@ namespace FuzzyPotato.Core.Tests.Examples
             WorkflowExecutionContext context,
             CancellationToken cancellationToken = default)
         {
-            context.ExecutionTrace.Add($"Executing PowerShell node: {this.NodeId} - {this.TypedDefinition.Name}");
+            context.ExecutionTrace.Add($"Executing PowerShell node: {this.NodeId} - {this.TypedDefinition.NodeName}");
 
             // Simulated execution - in real implementation, use System.Management.Automation
             await Task.Delay(100, cancellationToken);

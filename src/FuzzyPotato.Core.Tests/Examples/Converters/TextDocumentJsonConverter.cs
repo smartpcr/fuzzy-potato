@@ -52,9 +52,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
                     case "name":
                         textDoc.Name = property.Value.GetString() ?? string.Empty;
                         break;
-                    case "createdAt":
-                        textDoc.CreatedAt = property.Value.GetDateTime();
-                        break;
                 }
             }
 
@@ -71,7 +68,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
             writer.WriteString("language", value.Language);
             writer.WriteString("id", value.Id);
             writer.WriteString("name", value.Name);
-            writer.WriteString("createdAt", value.CreatedAt);
             writer.WriteEndObject();
         }
     }

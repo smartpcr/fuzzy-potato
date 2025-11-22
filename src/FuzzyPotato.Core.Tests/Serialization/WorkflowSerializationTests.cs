@@ -84,8 +84,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             // Arrange
             var node = new CSharpNode
             {
-                Id = "node-1",
-                Name = "Calculate Sum",
+                NodeId = "node-1",
+                NodeName = "Calculate Sum",
                 Description = "Calculates the sum of two numbers",
                 PositionX = 100,
                 PositionY = 200,
@@ -102,8 +102,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Assert
             deserialized.Should().NotBeNull();
-            deserialized!.Id.Should().Be(node.Id);
-            deserialized.Name.Should().Be(node.Name);
+            deserialized!.NodeId.Should().Be(node.NodeId);
+            deserialized.NodeName.Should().Be(node.NodeName);
             deserialized.Description.Should().Be(node.Description);
             deserialized.Code.Should().Be(node.Code);
             deserialized.Usings.Should().BeEquivalentTo(node.Usings);
@@ -120,8 +120,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             // Arrange
             var node = new CSharpNode
             {
-                Id = "node-1",
-                Name = "Calculate Sum",
+                NodeId = "node-1",
+                NodeName = "Calculate Sum",
                 Description = "Calculates the sum of two numbers",
                 Code = "var result = a + b; return result;",
                 Usings = new List<string> { "System", "System.Linq" },
@@ -134,8 +134,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
 
             // Assert
             deserialized.Should().NotBeNull();
-            deserialized!.Id.Should().Be(node.Id);
-            deserialized.Name.Should().Be(node.Name);
+            deserialized!.NodeId.Should().Be(node.NodeId);
+            deserialized.NodeName.Should().Be(node.NodeName);
             deserialized.Code.Should().Be(node.Code);
             deserialized.Usings.Should().BeEquivalentTo(node.Usings);
         }
@@ -151,8 +151,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             {
                 new CSharpNode
                 {
-                    Id = "node-1",
-                    Name = "C# Node",
+                    NodeId = "node-1",
+                    NodeName = "C# Node",
                     Code = "Console.WriteLine(\"Hello\");",
                 },
                 new PowerShellScriptNode
@@ -164,15 +164,15 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 },
                 new HttpRequestNode
                 {
-                    Id = "node-3",
-                    Name = "HTTP Request",
+                    NodeId = "node-3",
+                    NodeName = "HTTP Request",
                     Method = "GET",
                     Url = "https://api.example.com/data",
                 },
                 new DelayNode
                 {
-                    Id = "node-4",
-                    Name = "Wait",
+                    NodeId = "node-4",
+                    NodeName = "Wait",
                     DelayMs = 1000,
                 },
             };
@@ -202,14 +202,14 @@ namespace FuzzyPotato.Core.Tests.Serialization
             {
                 new CSharpNode
                 {
-                    Id = "node-1",
-                    Name = "C# Node",
+                    NodeId = "node-1",
+                    NodeName = "C# Node",
                     Code = "Console.WriteLine(\"Hello\");",
                 },
                 new IfElseNode
                 {
-                    Id = "node-2",
-                    Name = "Condition",
+                    NodeId = "node-2",
+                    NodeName = "Condition",
                     Condition = "x > 0",
                     TrueNodeId = "node-3",
                     FalseNodeId = "node-4",
@@ -347,8 +347,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
             // Arrange
             var node = new CSharpNode
             {
-                Id = "test-node",
-                Name = "Test",
+                NodeId = "test-node",
+                NodeName = "Test",
                 Code = "return 42;",
             };
 
@@ -383,30 +383,30 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 {
                     new WhileLoopNode
                     {
-                        Id = "loop-node",
-                        Name = "Main Loop",
+                        NodeId = "loop-node",
+                        NodeName = "Main Loop",
                         Condition = "counter < 10",
                         MaxIterations = 100,
                         LoopBodyStartNodeId = "condition-node",
                     },
                     new IfElseNode
                     {
-                        Id = "condition-node",
-                        Name = "Check Value",
+                        NodeId = "condition-node",
+                        NodeName = "Check Value",
                         Condition = "value > 5",
                         TrueNodeId = "true-branch",
                         FalseNodeId = "false-branch",
                     },
                     new CSharpNode
                     {
-                        Id = "true-branch",
-                        Name = "Handle True",
+                        NodeId = "true-branch",
+                        NodeName = "Handle True",
                         Code = "Console.WriteLine(\"True\");",
                     },
                     new CSharpNode
                     {
-                        Id = "false-branch",
-                        Name = "Handle False",
+                        NodeId = "false-branch",
+                        NodeName = "Handle False",
                         Code = "Console.WriteLine(\"False\");",
                     },
                 },
@@ -448,8 +448,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
                 {
                     new CSharpNode
                     {
-                        Id = "start-node",
-                        Name = "Initialize",
+                        NodeId = "start-node",
+                        NodeName = "Initialize",
                         Description = "Initialize workflow variables",
                         PositionX = 100,
                         PositionY = 100,
@@ -458,8 +458,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
                     },
                     new HttpRequestNode
                     {
-                        Id = "http-node",
-                        Name = "Fetch Data",
+                        NodeId = "http-node",
+                        NodeName = "Fetch Data",
                         Description = "Fetch data from API",
                         PositionX = 300,
                         PositionY = 100,
@@ -472,8 +472,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
                     },
                     new IfElseNode
                     {
-                        Id = "condition-node",
-                        Name = "Check Response",
+                        NodeId = "condition-node",
+                        NodeName = "Check Response",
                         Description = "Check if response is successful",
                         PositionX = 500,
                         PositionY = 100,
@@ -483,8 +483,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
                     },
                     new DelayNode
                     {
-                        Id = "success-node",
-                        Name = "Success Delay",
+                        NodeId = "success-node",
+                        NodeName = "Success Delay",
                         Description = "Wait before continuing",
                         PositionX = 700,
                         PositionY = 50,
@@ -492,8 +492,8 @@ namespace FuzzyPotato.Core.Tests.Serialization
                     },
                     new PowerShellScriptNode
                     {
-                        Id = "error-node",
-                        Name = "Error Handler",
+                        NodeId = "error-node",
+                        NodeName = "Error Handler",
                         Description = "Handle error",
                         PositionX = 700,
                         PositionY = 150,

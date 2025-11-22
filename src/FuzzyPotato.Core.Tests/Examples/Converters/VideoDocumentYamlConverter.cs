@@ -67,9 +67,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
                         case "name":
                             doc.Name = parser.Consume<Scalar>().Value;
                             break;
-                        case "createdAt":
-                            doc.CreatedAt = DateTime.Parse(parser.Consume<Scalar>().Value);
-                            break;
                         default:
                             // Skip unknown properties
                             this.SkipValue(parser);
@@ -119,9 +116,6 @@ namespace FuzzyPotato.Core.Tests.Examples.Converters
 
             emitter.Emit(new Scalar("name"));
             emitter.Emit(new Scalar(doc.Name));
-
-            emitter.Emit(new Scalar("createdAt"));
-            emitter.Emit(new Scalar(doc.CreatedAt.ToString("o")));
 
             emitter.Emit(new MappingEnd());
         }

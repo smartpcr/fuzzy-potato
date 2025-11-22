@@ -9,8 +9,9 @@ namespace FuzzyPotato.Core.Tests.Serialization
     using System;
     using System.Collections.Generic;
     using System.Text.Json.Serialization;
-    using FuzzyPotato.Core.Tests.Examples.Converters;
-    using FuzzyPotato.Core.Tests.Examples.Nodes;
+    using FuzzyPotato.Core.Serialization;
+    using FuzzyPotato.Core.Tests.Examples.Documents.Converters;
+    using FuzzyPotato.Core.Tests.Examples.Nodes.Converters;
     using YamlDotNet.Serialization;
 
     /// <summary>
@@ -44,7 +45,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public static IReadOnlyList<JsonConverter> JsonConverters { get; } = new List<JsonConverter>
         {
             // Polymorphic base converter (must be registered first to handle all polymorphic types)
-            new BaseJsonConverter(),
+            new BaseJsonConverter(TypeNameToTypeMap),
 
             // Document base converter
             new DocumentBaseJsonConverter(),
@@ -81,41 +82,53 @@ namespace FuzzyPotato.Core.Tests.Serialization
             new SubflowNodeJsonConverter(),
         };
 
+        private static readonly List<IYamlTypeConverter> _yamlConvertersList = BuildYamlConverters();
+
         /// <summary>
         /// Gets all YAML type converters for polymorphic types.
         /// </summary>
-        public static IReadOnlyList<IYamlTypeConverter> YamlConverters { get; } = new List<IYamlTypeConverter>
-        {
-            // Polymorphic base converter (handles all PolymorphicBase-derived types including DocumentBase and NodeDefinition)
-            new BaseYamlConverter(),
+        public static IReadOnlyList<IYamlTypeConverter> YamlConverters => _yamlConvertersList;
 
+        private static List<IYamlTypeConverter> BuildYamlConverters()
+        {
+            var converters = new List<IYamlTypeConverter>();
+
+            // First, add all concrete converters
             // Document converters
-            new TextDocumentYamlConverter(),
-            new ImageDocumentYamlConverter(),
-            new VideoDocumentYamlConverter(),
+            converters.Add(new TextDocumentYamlConverter());
+            converters.Add(new ImageDocumentYamlConverter());
+            converters.Add(new VideoDocumentYamlConverter());
 
             // Script node converters
-            new CSharpScriptNodeYamlConverter(),
-            new CSharpTaskNodeYamlConverter(),
-            new PowerShellScriptNodeYamlConverter(),
-            new PowerShellTaskNodeYamlConverter(),
+            converters.Add(new CSharpScriptNodeYamlConverter());
+            converters.Add(new CSharpTaskNodeYamlConverter());
+            converters.Add(new PowerShellScriptNodeYamlConverter());
+            converters.Add(new PowerShellTaskNodeYamlConverter());
 
             // Additional node converters
-            new HttpRequestNodeYamlConverter(),
-            new DelayNodeYamlConverter(),
-            new CSharpNodeYamlConverter(),
-            new WhileLoopNodeYamlConverter(),
+            converters.Add(new HttpRequestNodeYamlConverter());
+            converters.Add(new DelayNodeYamlConverter());
+            converters.Add(new CSharpNodeYamlConverter());
+            converters.Add(new WhileLoopNodeYamlConverter());
 
             // Control flow node converters
-            new IfElseNodeYamlConverter(),
-            new ForEachNodeYamlConverter(),
-            new WhileNodeYamlConverter(),
-            new SwitchNodeYamlConverter(),
-            new TimerNodeYamlConverter(),
+            converters.Add(new IfElseNodeYamlConverter());
+            converters.Add(new ForEachNodeYamlConverter());
+            converters.Add(new WhileNodeYamlConverter());
+            converters.Add(new SwitchNodeYamlConverter());
+            converters.Add(new TimerNodeYamlConverter());
 
             // Structural node converters
-            new ContainerNodeYamlConverter(),
-            new SubflowNodeYamlConverter(),
-        };
+            converters.Add(new ContainerNodeYamlConverter());
+            converters.Add(new SubflowNodeYamlConverter());
+
+            // Then create base converter with reference to the list
+            var baseConverter = new BaseYamlConverter(TypeNameToTypeMap, converters);
+
+            // Insert base converter at the beginning
+            converters.Insert(0, baseConverter);
+
+            return converters;
+        }
     }
 }

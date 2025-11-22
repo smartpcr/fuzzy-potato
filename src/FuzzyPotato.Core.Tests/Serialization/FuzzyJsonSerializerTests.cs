@@ -9,7 +9,7 @@ namespace FuzzyPotato.Core.Tests.Serialization
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Tests.Examples;
+    using FuzzyPotato.Core.Tests.Examples.Documents;
 
     [TestClass]
     public class FuzzyJsonSerializerTests

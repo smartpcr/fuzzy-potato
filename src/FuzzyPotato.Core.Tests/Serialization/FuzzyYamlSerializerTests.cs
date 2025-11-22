@@ -7,7 +7,7 @@
 namespace FuzzyPotato.Core.Tests.Serialization
 {
     using FuzzyPotato.Core.Models;
-    using FuzzyPotato.Core.Tests.Examples;
+    using FuzzyPotato.Core.Tests.Examples.Documents;
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
 

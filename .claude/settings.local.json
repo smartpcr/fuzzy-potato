@@ -8,7 +8,17 @@
       "Bash(dotnet list:*)",
       "Bash(xargs basename:*)",
       "Bash(timeout 30 dotnet test:*)",
-      "Bash(timeout 20 dotnet test:*)"
+      "Bash(timeout 20 dotnet test:*)",
+      "Bash(git mv:*)",
+      "Bash(for file in CSharpNodeJsonConverter.cs CSharpNodeYamlConverter.cs CSharpScriptNodeJsonConverter.cs CSharpScriptNodeYamlConverter.cs CSharpTaskNodeJsonConverter.cs CSharpTaskNodeYamlConverter.cs ContainerNodeJsonConverter.cs ContainerNodeYamlConverter.cs DelayNodeJsonConverter.cs DelayNodeYamlConverter.cs ForEachNodeJsonConverter.cs ForEachNodeYamlConverter.cs HttpRequestNodeJsonConverter.cs HttpRequestNodeYamlConverter.cs IfElseNodeJsonConverter.cs IfElseNodeYamlConverter.cs PowerShellScriptNodeJsonConverter.cs PowerShellScriptNodeYamlConverter.cs PowerShellTaskNodeJsonConverter.cs PowerShellTaskNodeYamlConverter.cs SubflowNodeJsonConverter.cs SubflowNodeYamlConverter.cs SwitchNodeJsonConverter.cs SwitchNodeYamlConverter.cs TimerNodeJsonConverter.cs TimerNodeYamlConverter.cs WhileLoopNodeJsonConverter.cs WhileLoopNodeYamlConverter.cs WhileNodeJsonConverter.cs WhileNodeYamlConverter.cs)",
+      "Bash(do sed -i 's/namespace FuzzyPotato.Core.Tests.Examples.Nodes/namespace FuzzyPotato.Core.Tests.Examples.Nodes.Converters/' \"$file\")",
+      "Bash(done)",
+      "Bash(dotnet clean:*)",
+      "Bash(cat:*)",
+      "Bash(for file in CSharpScriptNodeJsonConverter.cs CSharpTaskNodeJsonConverter.cs PowerShellScriptNodeJsonConverter.cs PowerShellTaskNodeJsonConverter.cs HttpRequestNodeJsonConverter.cs DelayNodeJsonConverter.cs WhileLoopNodeJsonConverter.cs IfElseNodeJsonConverter.cs ForEachNodeJsonConverter.cs WhileNodeJsonConverter.cs SwitchNodeJsonConverter.cs TimerNodeJsonConverter.cs ContainerNodeJsonConverter.cs SubflowNodeJsonConverter.cs)",
+      "Bash(do sed -i '/using System.Text.Json.Serialization;/a\\    using FuzzyPotato.Core.Tests.Examples.Nodes;' \"$file\")",
+      "Bash(chmod:*)",
+      "Bash(/tmp/build.sh)"
     ],
     "deny": [],
     "ask": []

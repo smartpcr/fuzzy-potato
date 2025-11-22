@@ -8,15 +8,14 @@ namespace FuzzyPotato.Core.Serialization
 {
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
-    using FuzzyPotato.Core.Models;
 
     /// <summary>
     /// YAML serializer with polymorphic support via TypeRegistry.
     /// </summary>
     public class FuzzyYamlSerializer
     {
-        private readonly ISerializer _serializer;
-        private readonly IDeserializer _deserializer;
+        private readonly ISerializer serializer;
+        private readonly IDeserializer deserializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FuzzyYamlSerializer"/> class.
@@ -32,7 +31,7 @@ namespace FuzzyPotato.Core.Serialization
                 .WithTypeInspector(inner => new PolymorphicYamlSerializingTypeInspector(inner));
 
             configureSerializer?.Invoke(serializerBuilder);
-            this._serializer = serializerBuilder.Build();
+            this.serializer = serializerBuilder.Build();
 
             var deserializerBuilder = new DeserializerBuilder()
                 .WithNamingConvention(CamelCaseNamingConvention.Instance)
@@ -41,7 +40,7 @@ namespace FuzzyPotato.Core.Serialization
                     syntax => syntax.InsteadOf<YamlDotNet.Serialization.NodeDeserializers.ObjectNodeDeserializer>());
 
             configureDeserializer?.Invoke(deserializerBuilder);
-            this._deserializer = deserializerBuilder.Build();
+            this.deserializer = deserializerBuilder.Build();
         }
 
         /// <summary>
@@ -53,7 +52,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>YAML string representation.</returns>
         public string Serialize<T>(T value)
         {
-            return this._serializer.Serialize(value);
+            return this.serializer.Serialize(value);
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>YAML string representation.</returns>
         public string SerializeCollection<T>(IEnumerable<T> values)
         {
-            return this._serializer.Serialize(values);
+            return this.serializer.Serialize(values);
         }
 
         /// <summary>
@@ -75,9 +74,9 @@ namespace FuzzyPotato.Core.Serialization
         /// <typeparam name="T">The expected type.</typeparam>
         /// <param name="yaml">The YAML string.</param>
         /// <returns>Deserialized object.</returns>
-        public T? Deserialize<T>(string yaml)
+        public T Deserialize<T>(string yaml)
         {
-            return this._deserializer.Deserialize<T>(yaml);
+            return this.deserializer.Deserialize<T>(yaml);
         }
 
         /// <summary>
@@ -87,9 +86,9 @@ namespace FuzzyPotato.Core.Serialization
         /// <typeparam name="T">The base type of collection items.</typeparam>
         /// <param name="yaml">The YAML string.</param>
         /// <returns>Collection of deserialized objects.</returns>
-        public IEnumerable<T>? DeserializeCollection<T>(string yaml)
+        public IEnumerable<T> DeserializeCollection<T>(string yaml)
         {
-            return this._deserializer.Deserialize<IEnumerable<T>>(yaml);
+            return this.deserializer.Deserialize<IEnumerable<T>>(yaml);
         }
 
         /// <summary>

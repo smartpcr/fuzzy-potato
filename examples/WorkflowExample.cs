@@ -42,12 +42,12 @@ namespace FuzzyPotato.Examples
 
         private static void RegisterNodeTypes()
         {
-            TypeRegistry.Register<CSharpNode>("csharp-node");
-            TypeRegistry.Register<PowerShellScriptNode>("powershell-node");
-            TypeRegistry.Register<WhileLoopNode>("while-loop-node");
-            TypeRegistry.Register<IfElseNode>("if-else-node");
-            TypeRegistry.Register<HttpRequestNode>("http-request-node");
-            TypeRegistry.Register<DelayNode>("delay-node");
+            TypeRegistry.Register<CSharpNode>();
+            TypeRegistry.Register<PowerShellScriptNode>();
+            TypeRegistry.Register<WhileLoopNode>();
+            TypeRegistry.Register<IfElseNode>();
+            TypeRegistry.Register<HttpRequestNode>();
+            TypeRegistry.Register<DelayNode>();
 
             Console.WriteLine("✓ Registered all workflow node types\n");
         }

@@ -6,14 +6,17 @@
 
 namespace FuzzyPotato.Core.Models
 {
-    using System.Text.Json.Serialization;
-
     /// <summary>
     /// Base class for polymorphic serialization support.
-    /// Derived classes must specify their type discriminator using JsonDerivedType attributes.
+    /// Derived classes must specify their type discriminator via the TypeName property.
     /// </summary>
     public abstract class PolymorphicBase
     {
+        /// <summary>
+        /// Gets the type discriminator used for polymorphic serialization.
+        /// </summary>
+        public abstract string TypeName { get; }
+
         /// <summary>
         /// Gets or sets the unique identifier.
         /// </summary>

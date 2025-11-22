@@ -2,7 +2,7 @@
 
 ## Session {N}: {Brief Description}
 
-### {HH:MM AM/PM} - {Topic}
+### HH:mm - {Topic}
 **User:**
 > {User's exact prompt or paraphrase}
 
@@ -21,7 +21,7 @@
 
 ---
 
-### {HH:MM AM/PM} - {Next Topic}
+### HH:mm - {Next Topic}
 **User:**
 > {User's next prompt}
 

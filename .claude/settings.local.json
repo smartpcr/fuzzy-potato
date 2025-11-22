@@ -1,4 +1,5 @@
 {
+  "defaultMode": "bypassPermissions",
   "permissions": {
     "allow": [
       "*"
@@ -7,8 +8,9 @@
     "ask": []
   },
   "hooks": {
-    "Start": [
+    "SessionStart": [
       {
+        "matcher": "*",
         "hooks": [
           {
             "type": "command",

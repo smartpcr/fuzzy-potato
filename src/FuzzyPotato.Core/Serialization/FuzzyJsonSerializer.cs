@@ -8,14 +8,13 @@ namespace FuzzyPotato.Core.Serialization
 {
     using System.Text.Json;
     using System.Text.Json.Serialization;
-    using FuzzyPotato.Core.Models;
 
     /// <summary>
     /// JSON serializer with TypeRegistry-based polymorphic support.
     /// </summary>
     public class FuzzyJsonSerializer
     {
-        private readonly JsonSerializerOptions _options;
+        private readonly JsonSerializerOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FuzzyJsonSerializer"/> class.
@@ -23,7 +22,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <param name="configure">Optional action to configure JSON options.</param>
         public FuzzyJsonSerializer(Action<JsonSerializerOptions>? configure = null)
         {
-            this._options = new JsonSerializerOptions
+            this.options = new JsonSerializerOptions
             {
                 WriteIndented = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -35,7 +34,7 @@ namespace FuzzyPotato.Core.Serialization
                 },
             };
 
-            configure?.Invoke(this._options);
+            configure?.Invoke(this.options);
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>JSON string representation.</returns>
         public string Serialize<T>(T value)
         {
-            return JsonSerializer.Serialize(value, this._options);
+            return JsonSerializer.Serialize(value, this.options);
         }
 
         /// <summary>
@@ -59,7 +58,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>JSON string representation.</returns>
         public string SerializeCollection<T>(IEnumerable<T> values)
         {
-            return JsonSerializer.Serialize(values, this._options);
+            return JsonSerializer.Serialize(values, this.options);
         }
 
         /// <summary>
@@ -71,7 +70,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>Deserialized object.</returns>
         public T? Deserialize<T>(string json)
         {
-            return JsonSerializer.Deserialize<T>(json, this._options);
+            return JsonSerializer.Deserialize<T>(json, this.options);
         }
 
         /// <summary>
@@ -83,7 +82,7 @@ namespace FuzzyPotato.Core.Serialization
         /// <returns>Collection of deserialized objects.</returns>
         public IEnumerable<T>? DeserializeCollection<T>(string json)
         {
-            return JsonSerializer.Deserialize<IEnumerable<T>>(json, this._options);
+            return JsonSerializer.Deserialize<IEnumerable<T>>(json, this.options);
         }
 
         /// <summary>

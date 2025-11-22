@@ -24,7 +24,7 @@ Each daily log file follows this structure:
 
 ## Session {N}: {Brief Description}
 
-### {Time} - {Topic}
+### HH:mm - {Topic}
 **User:**
 > {User's prompt}
 
@@ -47,7 +47,7 @@ Each daily log file follows this structure:
 
 - Files are organized by date: `YYYY/MM/YYYY-MM-DD.md`
 - Each session within a day is numbered sequentially
-- Timestamps use 12-hour format with AM/PM
+- Timestamps use 24-hour format (HH:mm) from the current time when each milestone occurs
 - Summaries capture the essence of responses, not verbatim transcripts
 - Key decisions and technology choices are highlighted for future reference
 

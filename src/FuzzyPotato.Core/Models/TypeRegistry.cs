@@ -17,12 +17,13 @@ namespace FuzzyPotato.Core.Models
         private static readonly Dictionary<Type, string> ReverseTypeMap = new();
 
         /// <summary>
-        /// Registers a type with a discriminator value.
+        /// Registers a type using its TypeName property as the discriminator.
         /// </summary>
         /// <typeparam name="T">The type to register.</typeparam>
-        /// <param name="discriminator">The discriminator value.</param>
-        public static void Register<T>(string discriminator) where T : PolymorphicBase
+        public static void Register<T>() where T : PolymorphicBase, new()
         {
+            var instance = Activator.CreateInstance<T>();
+            var discriminator = instance.TypeName;
             var type = typeof(T);
             TypeMap[discriminator] = type;
             ReverseTypeMap[type] = discriminator;
@@ -35,7 +36,7 @@ namespace FuzzyPotato.Core.Models
         /// <returns>The registered type, or null if not found.</returns>
         public static Type? GetType(string discriminator)
         {
-            return TypeMap.TryGetValue(discriminator, out var type) ? type : null;
+            return TypeRegistry.TypeMap.GetValueOrDefault(discriminator);
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace FuzzyPotato.Core.Models
         /// <returns>The discriminator value, or null if not found.</returns>
         public static string? GetDiscriminator(Type type)
         {
-            return ReverseTypeMap.TryGetValue(type, out var discriminator) ? discriminator : null;
+            return TypeRegistry.ReverseTypeMap.GetValueOrDefault(type);
         }
 
         /// <summary>

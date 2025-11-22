@@ -95,7 +95,7 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class NodeFactory
     {
-        private readonly Dictionary<string, Func<NodeDefinition, IExecutableNode>> _factoryMethods = new();
+        private readonly Dictionary<string, Func<NodeDefinition, IExecutableNode>> factoryMethods = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NodeFactory"/> class.
@@ -117,11 +117,11 @@ namespace FuzzyPotato.Core.Tests.Examples
         /// <typeparam name="TNode">The node definition type.</typeparam>
         /// <param name="factory">The factory method.</param>
         public void RegisterFactory<TNode>(Func<NodeDefinition, IExecutableNode> factory)
-            where TNode : NodeDefinition
+            where TNode : NodeDefinition, new()
         {
-            var discriminator = TypeRegistry.GetDiscriminator(typeof(TNode))
-                ?? throw new InvalidOperationException($"Type {typeof(TNode).Name} is not registered in TypeRegistry");
-            this._factoryMethods[discriminator] = factory;
+            var instance = new TNode();
+            var discriminator = instance.TypeName;
+            this.factoryMethods[discriminator] = factory;
         }
 
         /// <summary>
@@ -131,10 +131,9 @@ namespace FuzzyPotato.Core.Tests.Examples
         /// <returns>An executable node instance.</returns>
         public IExecutableNode CreateNode(NodeDefinition definition)
         {
-            var discriminator = TypeRegistry.GetDiscriminator(definition.GetType())
-                ?? throw new InvalidOperationException($"Unknown node type: {definition.GetType().Name}");
+            var discriminator = definition.TypeName;
 
-            if (!this._factoryMethods.TryGetValue(discriminator, out var factory))
+            if (!this.factoryMethods.TryGetValue(discriminator, out var factory))
             {
                 throw new InvalidOperationException($"No factory registered for node type: {discriminator}");
             }

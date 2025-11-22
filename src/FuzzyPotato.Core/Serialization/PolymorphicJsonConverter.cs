@@ -12,52 +12,14 @@ namespace FuzzyPotato.Core.Serialization
     using FuzzyPotato.Core.Models;
 
     /// <summary>
-    /// JSON converter factory that creates converters for types registered in TypeRegistry.
-    /// </summary>
-    public class PolymorphicJsonConverterFactory : JsonConverterFactory
-    {
-        /// <inheritdoc/>
-        public override bool CanConvert(Type typeToConvert)
-        {
-            // Don't handle System.Object - too broad and can be primitives in Dictionary<string, object>
-            if (typeToConvert == typeof(object))
-            {
-                return false;
-            }
-
-            // Check if this type or any of its registered derived types are in TypeRegistry
-            if (TypeRegistry.GetDiscriminator(typeToConvert) != null)
-            {
-                return true;
-            }
-
-            // Check if any registered type derives from this type
-            foreach (var kvp in TypeRegistry.GetAllTypes())
-            {
-                if (typeToConvert.IsAssignableFrom(kvp.Value))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc/>
-        public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
-        {
-            var converterType = typeof(PolymorphicJsonConverter<>).MakeGenericType(typeToConvert);
-            return (JsonConverter?)Activator.CreateInstance(converterType);
-        }
-    }
-
-    /// <summary>
-    /// Custom JSON converter for polymorphic types using TypeRegistry.
+    /// Custom JSON converter for polymorphic types using TypeName property.
     /// </summary>
     /// <typeparam name="TBase">The base type for polymorphic serialization.</typeparam>
     internal class PolymorphicJsonConverter<TBase> : JsonConverter<TBase>
     {
         private const string TypeDiscriminatorPropertyName = "$type";
+        private static readonly Dictionary<string, Type> TypeCache = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly object CacheLock = new();
 
         /// <inheritdoc/>
         public override TBase? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -96,11 +58,11 @@ namespace FuzzyPotato.Core.Serialization
                 throw new JsonException($"Invalid '{TypeDiscriminatorPropertyName}' value");
             }
 
-            // Get the actual type from TypeRegistry
-            var actualType = TypeRegistry.GetType(discriminator);
+            // Get the actual type by TypeName
+            var actualType = PolymorphicJsonConverter<TBase>.GetTypeByTypeName(discriminator);
             if (actualType == null)
             {
-                throw new JsonException($"Type '{discriminator}' not registered in TypeRegistry. Call TypeRegistry.Register<T>(\"{discriminator}\") first.");
+                throw new JsonException($"Type with TypeName '{discriminator}' not found. Ensure the type exists and has a parameterless constructor.");
             }
 
             // Deserialize to the actual type (without this converter to avoid recursion)
@@ -120,11 +82,17 @@ namespace FuzzyPotato.Core.Serialization
             }
 
             var actualType = value.GetType();
-            var discriminator = TypeRegistry.GetDiscriminator(actualType);
+            string? discriminator = null;
+
+            // Get TypeName from the instance if it's a PolymorphicBase
+            if (value is PolymorphicBase polymorphicInstance)
+            {
+                discriminator = polymorphicInstance.TypeName;
+            }
 
             if (string.IsNullOrEmpty(discriminator))
             {
-                // Type not registered - serialize normally
+                // Type doesn't have TypeName - serialize normally
                 var tempOptions = new JsonSerializerOptions(options);
                 tempOptions.Converters.Clear();
                 JsonSerializer.Serialize(writer, value, actualType, tempOptions);
@@ -144,10 +112,60 @@ namespace FuzzyPotato.Core.Serialization
 
             foreach (var property in doc.RootElement.EnumerateObject())
             {
-                property.WriteTo(writer);
+                // Skip TypeName property - we already wrote $type
+                if (property.Name != nameof(PolymorphicBase.TypeName))
+                {
+                    property.WriteTo(writer);
+                }
             }
 
             writer.WriteEndObject();
+        }
+
+        /// <summary>
+        /// Gets a type by its TypeName discriminator.
+        /// </summary>
+        /// <param name="typeName">The TypeName discriminator.</param>
+        /// <returns>The type, or null if not found.</returns>
+        private static Type? GetTypeByTypeName(string typeName)
+        {
+            lock (CacheLock)
+            {
+                // Check cache first
+                if (TypeCache.TryGetValue(typeName, out var cachedType))
+                {
+                    return cachedType;
+                }
+
+                // Scan loaded assemblies for PolymorphicBase types
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        if (typeof(PolymorphicBase).IsAssignableFrom(type) &&
+                            !type.IsAbstract &&
+                            type.GetConstructor(Type.EmptyTypes) != null)
+                        {
+                            try
+                            {
+                                // Create instance to get TypeName
+                                var instance = Activator.CreateInstance(type) as PolymorphicBase;
+                                if (instance != null && !TypeCache.ContainsKey(instance.TypeName))
+                                {
+                                    TypeCache[instance.TypeName] = type;
+                                }
+                            }
+                            catch
+                            {
+                                // Skip types that can't be instantiated
+                            }
+                        }
+                    }
+                }
+
+                // Try again after scanning
+                return TypeCache.GetValueOrDefault(typeName);
+            }
         }
     }
 }

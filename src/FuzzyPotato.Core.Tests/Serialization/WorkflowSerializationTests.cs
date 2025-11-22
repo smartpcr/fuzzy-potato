@@ -31,13 +31,13 @@ namespace FuzzyPotato.Core.Tests.Serialization
         [ClassInitialize]
         public static void ClassInitialize(TestContext context)
         {
-            // Register all workflow node types for YAML serialization
-            TypeRegistry.Register<CSharpNode>("csharp-node");
-            TypeRegistry.Register<PowerShellScriptNode>("powershell-node");
-            TypeRegistry.Register<WhileLoopNode>("while-loop-node");
-            TypeRegistry.Register<IfElseNode>("if-else-node");
-            TypeRegistry.Register<HttpRequestNode>("http-request-node");
-            TypeRegistry.Register<DelayNode>("delay-node");
+            // Register all workflow node types for polymorphic serialization
+            TypeRegistry.Register<CSharpNode>();
+            TypeRegistry.Register<PowerShellScriptNode>();
+            TypeRegistry.Register<WhileLoopNode>();
+            TypeRegistry.Register<IfElseNode>();
+            TypeRegistry.Register<HttpRequestNode>();
+            TypeRegistry.Register<DelayNode>();
         }
 
         /// <summary>

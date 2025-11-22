@@ -49,20 +49,28 @@ dotnet pack --configuration Release
 
 **DO NOT use `JsonPolymorphic` attributes** - The library uses a custom converter approach instead.
 
-#### The TypeRegistry Pattern
-TypeRegistry is the single source of truth for type resolution:
-- **JSON**: Custom `PolymorphicJsonConverterFactory` automatically detects TypeRegistry-registered types
-- **YAML**: Custom `PolymorphicYamlNodeDeserializer` resolves types at parse time
+#### The TypeName Property Pattern
+Each polymorphic type declares its discriminator via the abstract `TypeName` property:
+- **JSON**: Custom `PolymorphicJsonConverterFactory` automatically detects PolymorphicBase-derived types
+- **YAML**: Custom `PolymorphicYamlNodeDeserializer` resolves types by scanning assemblies
 - Both use `$type` discriminator property for type identification
+- Discriminator value comes from instance's `TypeName` property
 
 ```csharp
-// Type registration (required for YAML, automatic for JSON via custom converters)
-TypeRegistry.Register<TextDocument>("text-document");
+// Define polymorphic type with TypeName property
+public class TextDocument : DocumentBase
+{
+    public override string TypeName => "text-document";
+    // ... properties
+}
 
-// Serialization - automatically adds $type discriminator
+// Optional: Register for faster lookup (type is auto-discovered from TypeName)
+TypeRegistry.Register<TextDocument>();
+
+// Serialization - automatically adds $type discriminator from TypeName
 var json = serializer.Serialize(document);
 
-// Deserialization - automatically resolves type from $type
+// Deserialization - automatically resolves type from $type via assembly scanning
 var result = serializer.Deserialize<DocumentBase>(json);
 ```
 
@@ -144,16 +152,17 @@ All C# files must include this header:
 - Test namespace: `FuzzyPotato.Core.Tests.*`
 
 ### Type Registration in Tests
-**CRITICAL**: All polymorphic types must be registered in `[ClassInitialize]`:
+**OPTIONAL**: Types are auto-discovered, but you can pre-register for faster lookup in `[ClassInitialize]`:
 
 ```csharp
 [ClassInitialize]
 public static void ClassInitialize(TestContext context)
 {
-    TypeRegistry.Register<TextDocument>("text-document");
-    TypeRegistry.Register<ImageDocument>("image-document");
-    TypeRegistry.Register<CSharpNode>("csharp-node");
-    // ... register all polymorphic types used in tests
+    // Optional: Pre-register types for faster first access
+    TypeRegistry.Register<TextDocument>();
+    TypeRegistry.Register<ImageDocument>();
+    TypeRegistry.Register<CSharpNode>();
+    // Discriminators are automatically retrieved from TypeName property
 }
 ```
 
@@ -166,20 +175,22 @@ public static void ClassInitialize(TestContext context)
 
 ### Adding a New Polymorphic Type
 
-1. Create the derived class (no attributes needed):
+1. Create the derived class with TypeName property (no attributes needed):
 ```csharp
 public class CustomNode : NodeDefinition
 {
+    public override string TypeName => "custom-node";
+
     public string CustomProperty { get; set; }
 }
 ```
 
-2. Register in TypeRegistry where needed:
-```csharp
-TypeRegistry.Register<CustomNode>("custom-node");
-```
+2. The custom converters will automatically discover and handle serialization/deserialization
 
-3. The custom converters will automatically handle serialization/deserialization
+3. (Optional) Pre-register for faster first access:
+```csharp
+TypeRegistry.Register<CustomNode>();  // Automatically uses "custom-node" from TypeName
+```
 
 ### Modifying Serializers
 
@@ -196,27 +207,52 @@ TypeRegistry.Register<CustomNode>("custom-node");
 
 ### Debugging Serialization Issues
 
-1. Check TypeRegistry has all types registered
+1. Verify TypeName property is implemented correctly (returns kebab-case discriminator)
 2. Verify `$type` property appears in serialized output
 3. For YAML: Ensure `$type` is being filtered from buffered events
 4. For JSON: Check `CanConvert()` isn't excluding the type
 5. Add breakpoints in custom converter `Read()` and `Write()` methods
 
-## Documentation References
+## Detailed Documentation
 
-Comprehensive developer documentation in `.claude/agents/`:
-- **index.md** - Navigation hub for all documentation
-- **architecture.md** - Build system, CI/CD, project structure
-- **design.md** - SOLID principles, async patterns, error handling
-- **patterns.md** - Repository, Factory, Strategy, Builder patterns
-- **test-strategy.md** - Testing philosophy, AAA pattern, mocking
-- **usage-guide.md** - IDE setup, development workflow, common tasks
+**IMPORTANT**: The following documentation files contain in-depth technical details. Read them when working on related tasks:
 
-Prompt history in `.claude/prompts/2025/11/2025-11-20.md` documents:
-- Session 4: Complete architectural redesign to custom converters
-- Why JsonPolymorphic attributes were abandoned
-- Bug fixes (dictionary iteration, object type exclusion, delegation pattern)
-- Lessons learned about cross-assembly polymorphism
+### Core Architecture & Design
+- **[`.claude/agents/index.md`](.claude/agents/index.md)** - Navigation hub and documentation overview
+  - Read this first when exploring the documentation system
+
+- **[`.claude/agents/architecture.md`](.claude/agents/architecture.md)** - Build system, CI/CD, project structure
+  - **Read when**: Modifying build configuration, adding projects, changing dependencies, setting up CI/CD
+
+- **[`.claude/agents/design.md`](.claude/agents/design.md)** - SOLID principles, async patterns, error handling guidelines
+  - **Read when**: Implementing new features, refactoring code, establishing coding standards
+
+- **[`.claude/agents/serialization-design.md`](.claude/agents/serialization-design.md)** - Deep dive into polymorphic serialization architecture
+  - **Read when**: Debugging serialization issues, modifying converters, understanding type resolution
+
+### Patterns & Best Practices
+- **[`.claude/agents/patterns.md`](.claude/agents/patterns.md)** - Repository, Factory, Strategy, Builder patterns with examples
+  - **Read when**: Adding new design patterns, refactoring to use patterns, architectural decisions
+
+- **[`.claude/agents/test-strategy.md`](.claude/agents/test-strategy.md)** - Testing philosophy, AAA pattern, mocking strategies
+  - **Read when**: Writing tests, setting up test infrastructure, debugging test failures
+
+- **[`.claude/agents/usage-guide.md`](.claude/agents/usage-guide.md)** - IDE setup, development workflow, common tasks
+  - **Read when**: Setting up development environment, troubleshooting tooling issues
+
+### Historical Context
+Prompt history in `.claude/prompts/2025/11/` documents development sessions:
+- **[`.claude/prompts/2025/11/2025-11-20.md`](.claude/prompts/2025/11/2025-11-20.md)** - Session 4: Architectural redesign to custom converters
+  - Why JsonPolymorphic attributes were abandoned
+  - Bug fixes (dictionary iteration, object type exclusion, delegation pattern)
+  - Lessons learned about cross-assembly polymorphism
+
+- **[`.claude/prompts/2025/11/2025-11-21.md`](.claude/prompts/2025/11/2025-11-21.md)** - Session 5: TypeName-based discriminators
+  - Moved from hard-coded discriminators to TypeName property pattern
+  - Assembly scanning for automatic type discovery
+  - Simplified TypeRegistry.Register() API
+
+**Note**: When encountering complex issues or making architectural decisions, consult these documents to understand the rationale behind current design choices and avoid repeating past mistakes.
 
 ## Build System Notes
 
@@ -227,11 +263,13 @@ Prompt history in `.claude/prompts/2025/11/2025-11-20.md` documents:
 
 ## Key Pitfalls to Avoid
 
-1. **Never use JsonPolymorphic attributes** - Use TypeRegistry + custom converters
-2. **Don't forget TypeRegistry.Register()** in test ClassInitialize
-3. **YAML deserializers must delegate, not return false** when they can't handle a type
-4. **Filter `$type` from YAML events** before replaying to prevent property errors
-5. **Exclude `object` type from JSON converter** to handle Dictionary<string, object>
-6. **Clear converters list when recursing** to prevent infinite loops
-7. **Always use `this.` qualifier** for class members (EditorConfig enforced)
-8. **Use 4-space indentation for C#**, 2-space for everything else
+1. **Never use JsonPolymorphic attributes** - Use TypeName property + custom converters
+2. **Always implement TypeName property** in polymorphic types (abstract enforces this)
+3. **TypeName must return kebab-case string** (e.g., "text-document", not "TextDocument")
+4. **Filter TypeName property from serialization** - both "TypeName" and "typeName" (camelCase)
+5. **YAML deserializers must delegate, not return false** when they can't handle a type
+6. **Filter `$type` from YAML events** before replaying to prevent property errors
+7. **Exclude `object` type from JSON converter** to handle Dictionary<string, object>
+8. **Clear converters list when recursing** to prevent infinite loops
+9. **Always use `this.` qualifier** for class members (EditorConfig enforced)
+10. **Use 4-space indentation for C#**, 2-space for everything else

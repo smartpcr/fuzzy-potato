@@ -7,7 +7,6 @@
 namespace FuzzyPotato.Core.Tests.Examples
 {
     using System.Collections.Generic;
-    using System.Text.Json.Serialization;
     using FuzzyPotato.Core.Models;
 
     /// <summary>
@@ -43,6 +42,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class CSharpNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "csharp-node";
+
         /// <summary>
         /// Gets or sets the C# code to execute.
         /// </summary>
@@ -69,6 +71,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class PowerShellScriptNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "powershell-script-node";
+
         /// <summary>
         /// Gets or sets the PowerShell script to execute.
         /// </summary>
@@ -95,6 +100,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class WhileLoopNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "while-loop-node";
+
         /// <summary>
         /// Gets or sets the condition expression to evaluate.
         /// </summary>
@@ -121,6 +129,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class IfElseNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "if-else-node";
+
         /// <summary>
         /// Gets or sets the condition to evaluate.
         /// </summary>
@@ -142,6 +153,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class HttpRequestNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "http-request-node";
+
         /// <summary>
         /// Gets or sets the HTTP method (GET, POST, etc.).
         /// </summary>
@@ -178,6 +192,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class DelayNode : NodeDefinition
     {
+        /// <inheritdoc/>
+        public override string TypeName => "delay-node";
+
         /// <summary>
         /// Gets or sets the delay duration in milliseconds.
         /// </summary>

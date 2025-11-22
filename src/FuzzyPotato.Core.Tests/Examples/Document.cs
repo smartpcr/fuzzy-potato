@@ -22,6 +22,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class TextDocument : DocumentBase
     {
+        /// <inheritdoc/>
+        public override string TypeName => "text-document";
+
         /// <summary>
         /// Gets or sets the document content.
         /// </summary>
@@ -43,6 +46,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class ImageDocument : DocumentBase
     {
+        /// <inheritdoc/>
+        public override string TypeName => "image-document";
+
         /// <summary>
         /// Gets or sets the image URL.
         /// </summary>
@@ -69,6 +75,9 @@ namespace FuzzyPotato.Core.Tests.Examples
     /// </summary>
     public class VideoDocument : DocumentBase
     {
+        /// <inheritdoc/>
+        public override string TypeName => "video-document";
+
         /// <summary>
         /// Gets or sets the video URL.
         /// </summary>

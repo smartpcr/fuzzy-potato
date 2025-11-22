@@ -20,9 +20,9 @@ namespace FuzzyPotato.Core.Tests.Serialization
         {
             this._serializer = new FuzzyYamlSerializer();
             TypeRegistry.Clear();
-            TypeRegistry.Register<TextDocument>("text-document");
-            TypeRegistry.Register<ImageDocument>("image-document");
-            TypeRegistry.Register<VideoDocument>("video-document");
+            TypeRegistry.Register<TextDocument>();
+            TypeRegistry.Register<ImageDocument>();
+            TypeRegistry.Register<VideoDocument>();
         }
 
         [TestMethod]

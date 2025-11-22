@@ -19,9 +19,9 @@ namespace FuzzyPotato.Core.Tests.Serialization
         public static void ClassInitialize(TestContext context)
         {
             // Register types for polymorphic serialization
-            TypeRegistry.Register<TextDocument>("text-document");
-            TypeRegistry.Register<ImageDocument>("image-document");
-            TypeRegistry.Register<VideoDocument>("video-document");
+            TypeRegistry.Register<TextDocument>();
+            TypeRegistry.Register<ImageDocument>();
+            TypeRegistry.Register<VideoDocument>();
         }
 
         [TestInitialize]

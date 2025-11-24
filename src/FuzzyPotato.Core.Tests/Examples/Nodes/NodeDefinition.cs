@@ -7,9 +7,7 @@
 namespace FuzzyPotato.Core.Tests.Examples.Nodes
 {
     using System.Collections.Generic;
-    using System.Text.Json.Serialization;
     using FuzzyPotato.Core.Models;
-    using YamlDotNet.Serialization;
 
     /// <summary>
     /// Base class for all node definitions in a workflow.

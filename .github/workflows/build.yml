@@ -1,4 +1,4 @@
-name: Build, Test, and Publish Package
+name: build
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
 
     env:
       SOLUTION_FILE: FuzzyPotato.sln
-      NUGET_SOURCE: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      NUGET_SOURCE: https://nuget.pkg.github.com/smartpcr/index.json
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
     steps:
